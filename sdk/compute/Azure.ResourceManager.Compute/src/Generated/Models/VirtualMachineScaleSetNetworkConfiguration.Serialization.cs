@@ -36,6 +36,11 @@ namespace Azure.ResourceManager.Compute.Models
                 writer.WritePropertyName("enableAcceleratedNetworking");
                 writer.WriteBooleanValue(EnableAcceleratedNetworking.Value);
             }
+            if (Optional.IsDefined(IsTcpStateTrackingDisabled))
+            {
+                writer.WritePropertyName("disableTcpStateTracking");
+                writer.WriteBooleanValue(IsTcpStateTrackingDisabled.Value);
+            }
             if (Optional.IsDefined(EnableFpga))
             {
                 writer.WritePropertyName("enableFpga");
@@ -78,15 +83,16 @@ namespace Azure.ResourceManager.Compute.Models
         internal static VirtualMachineScaleSetNetworkConfiguration DeserializeVirtualMachineScaleSetNetworkConfiguration(JsonElement element)
         {
             string name = default;
-            Optional<string> id = default;
+            Optional<ResourceIdentifier> id = default;
             Optional<bool> primary = default;
             Optional<bool> enableAcceleratedNetworking = default;
+            Optional<bool> disableTcpStateTracking = default;
             Optional<bool> enableFpga = default;
             Optional<WritableSubResource> networkSecurityGroup = default;
             Optional<VirtualMachineScaleSetNetworkConfigurationDnsSettings> dnsSettings = default;
             Optional<IList<VirtualMachineScaleSetIPConfiguration>> ipConfigurations = default;
             Optional<bool> enableIPForwarding = default;
-            Optional<DeleteOptions> deleteOption = default;
+            Optional<ComputeDeleteOption> deleteOption = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("name"))
@@ -96,7 +102,12 @@ namespace Azure.ResourceManager.Compute.Models
                 }
                 if (property.NameEquals("id"))
                 {
-                    id = property.Value.GetString();
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    id = new ResourceIdentifier(property.Value.GetString());
                     continue;
                 }
                 if (property.NameEquals("properties"))
@@ -128,6 +139,16 @@ namespace Azure.ResourceManager.Compute.Models
                             enableAcceleratedNetworking = property0.Value.GetBoolean();
                             continue;
                         }
+                        if (property0.NameEquals("disableTcpStateTracking"))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                property0.ThrowNonNullablePropertyIsNull();
+                                continue;
+                            }
+                            disableTcpStateTracking = property0.Value.GetBoolean();
+                            continue;
+                        }
                         if (property0.NameEquals("enableFpga"))
                         {
                             if (property0.Value.ValueKind == JsonValueKind.Null)
@@ -145,7 +166,7 @@ namespace Azure.ResourceManager.Compute.Models
                                 property0.ThrowNonNullablePropertyIsNull();
                                 continue;
                             }
-                            networkSecurityGroup = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.ToString());
+                            networkSecurityGroup = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.GetRawText());
                             continue;
                         }
                         if (property0.NameEquals("dnsSettings"))
@@ -190,14 +211,14 @@ namespace Azure.ResourceManager.Compute.Models
                                 property0.ThrowNonNullablePropertyIsNull();
                                 continue;
                             }
-                            deleteOption = new DeleteOptions(property0.Value.GetString());
+                            deleteOption = new ComputeDeleteOption(property0.Value.GetString());
                             continue;
                         }
                     }
                     continue;
                 }
             }
-            return new VirtualMachineScaleSetNetworkConfiguration(id.Value, name, Optional.ToNullable(primary), Optional.ToNullable(enableAcceleratedNetworking), Optional.ToNullable(enableFpga), networkSecurityGroup, dnsSettings.Value, Optional.ToList(ipConfigurations), Optional.ToNullable(enableIPForwarding), Optional.ToNullable(deleteOption));
+            return new VirtualMachineScaleSetNetworkConfiguration(id.Value, name, Optional.ToNullable(primary), Optional.ToNullable(enableAcceleratedNetworking), Optional.ToNullable(disableTcpStateTracking), Optional.ToNullable(enableFpga), networkSecurityGroup, dnsSettings.Value, Optional.ToList(ipConfigurations), Optional.ToNullable(enableIPForwarding), Optional.ToNullable(deleteOption));
         }
     }
 }

@@ -6,11 +6,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Core.Pipeline;
-using Azure.ResourceManager.Management;
+using Azure.ResourceManager.ManagementGroups;
 using Azure.ResourceManager.Resources;
 using Azure.ResourceManager.Resources.Models;
 
@@ -24,10 +25,10 @@ namespace Azure.ResourceManager
         private TenantResource _tenant;
         private SubscriptionResource _defaultSubscription;
         private readonly ClientDiagnostics _subscriptionClientDiagnostics;
+        private bool? _canUseTagResource;
 
-        private Dictionary<ResourceType, string> ApiVersionOverrides { get; } = new Dictionary<ResourceType, string>();
-
-        internal ConcurrentDictionary<string, Dictionary<string, string>> ResourceApiVersionCache { get; } = new ConcurrentDictionary<string, Dictionary<string, string>>();
+        internal virtual Dictionary<ResourceType, string> ApiVersionOverrides { get; } = new Dictionary<ResourceType, string>();
+        internal ConcurrentDictionary<string, Dictionary<string, string>> ResourceApiVersionCache { get; } = new ConcurrentDictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
         internal ConcurrentDictionary<string, string> NamespaceVersionCache { get; } = new ConcurrentDictionary<string, string>();
 
         /// <summary>
@@ -54,7 +55,7 @@ namespace Azure.ResourceManager
         /// <param name="credential"> A credential used to authenticate to an Azure Service. </param>
         /// <param name="defaultSubscriptionId"> The id of the default Azure subscription. </param>
         /// <exception cref="ArgumentNullException"> If <see cref="TokenCredential"/> is null. </exception>
-        public ArmClient(TokenCredential credential, string defaultSubscriptionId): this(credential, defaultSubscriptionId, default)
+        public ArmClient(TokenCredential credential, string defaultSubscriptionId) : this(credential, defaultSubscriptionId, default)
         {
         }
 
@@ -88,6 +89,26 @@ namespace Azure.ResourceManager
                 new SubscriptionResource(this, SubscriptionResource.CreateResourceIdentifier(defaultSubscriptionId));
         }
 
+        internal virtual bool CanUseTagResource(CancellationToken cancellationToken = default)
+        {
+            if (_canUseTagResource == null)
+            {
+                var tagRp = GetDefaultSubscription(cancellationToken).GetResourceProvider(TagResource.ResourceType.Namespace, cancellationToken: cancellationToken);
+                _canUseTagResource = tagRp.Value.Data.ResourceTypes.Any(rp => rp.ResourceType == TagResource.ResourceType.Type);
+            }
+            return _canUseTagResource.Value;
+        }
+
+        internal virtual async Task<bool> CanUseTagResourceAsync(CancellationToken cancellationToken = default)
+        {
+            if (_canUseTagResource == null)
+            {
+                var tagRp = await GetDefaultSubscription(cancellationToken).GetResourceProviderAsync(TagResource.ResourceType.Namespace, cancellationToken: cancellationToken).ConfigureAwait(false);
+                _canUseTagResource = tagRp.Value.Data.ResourceTypes.Any(rp => rp.ResourceType == TagResource.ResourceType.Type);
+            }
+            return _canUseTagResource.Value;
+        }
+
         private void CopyApiVersionOverrides(ArmClientOptions options)
         {
             foreach (var keyValuePair in options.ResourceApiVersionOverrides)
@@ -95,7 +116,7 @@ namespace Azure.ResourceManager
                 ApiVersionOverrides.Add(keyValuePair.Key, keyValuePair.Value);
                 if (!ResourceApiVersionCache.TryGetValue(keyValuePair.Key.Namespace, out var apiVersionCache))
                 {
-                    apiVersionCache = new Dictionary<string, string>();
+                    apiVersionCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     ResourceApiVersionCache.TryAdd(keyValuePair.Key.Namespace, apiVersionCache);
                 }
                 apiVersionCache.Add(keyValuePair.Key.Type, keyValuePair.Value);

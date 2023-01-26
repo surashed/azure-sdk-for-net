@@ -1,9 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable disable // TODO: remove and fix errors
+
 using OpenTelemetry.Trace;
 using System;
 using System.Reflection;
+
+using Azure.Monitor.OpenTelemetry.Exporter.Internals.ConnectionString;
 
 using Xunit;
 
@@ -33,7 +37,7 @@ namespace Azure.Monitor.OpenTelemetry.Exporter.Tests
 
             GetInternalFields(exporter, out string ikey, out string endpoint);
             Assert.Equal(testIkey, ikey);
-            Assert.Equal(ConnectionString.Constants.DefaultIngestionEndpoint, endpoint);
+            Assert.Equal(Constants.DefaultIngestionEndpoint, endpoint);
         }
 
         [Fact]

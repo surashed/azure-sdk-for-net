@@ -22,6 +22,9 @@ param (
     [string] $ServiceDirectory,
 
     [Parameter()]
+    [string] $TestResourcesDirectory,
+
+    [Parameter()]
     [ValidatePattern('^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$')]
     [string] $TestApplicationId,
 
@@ -62,6 +65,10 @@ param (
     [Parameter()]
     [ValidateSet('AzureCloud', 'AzureUSGovernment', 'AzureChinaCloud', 'Dogfood')]
     [string] $Environment = 'AzureCloud',
+
+    [Parameter()]
+    [ValidateSet('test', 'perf')]
+    [string] $ResourceType = 'test',
 
     [Parameter()]
     [hashtable] $ArmTemplateParameters,
@@ -132,7 +139,7 @@ function Retry([scriptblock] $Action, [int] $Attempts = 5)
                 Write-Warning "Attempt $attempt failed: $_. Trying again in $sleep seconds..."
                 Start-Sleep -Seconds $sleep
             } else {
-                Write-Error -ErrorRecord $_
+                throw
             }
         }
     }
@@ -151,9 +158,26 @@ function NewServicePrincipalWrapper([string]$subscription, [string]$resourceGrou
         Write-Warning "Update-Module Az.Resources -RequiredVersion 5.3.1"
         exit 1
     }
-    $servicePrincipal = Retry {
-        New-AzADServicePrincipal -Role "Owner" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName" -DisplayName $displayName
+
+    try {
+        $servicePrincipal = Retry {
+            New-AzADServicePrincipal -Role "Owner" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName" -DisplayName $displayName
+        }
+    } catch {
+        # The underlying error "The directory object quota limit for the Principal has been exceeded" gets overwritten by the module trying
+        # to call New-AzADApplication with a null object instead of stopping execution, which makes this case hard to diagnose because it prints the following:
+        #      "Cannot bind argument to parameter 'ObjectId' because it is an empty string."
+        # Provide a more helpful diagnostic prompt to the user if appropriate:
+        $totalApps = (Get-AzADApplication -OwnedApplication).Length
+        $msg = "App Registrations owned by you total $totalApps and may exceed the max quota (likely around 135)." + `
+               "`nTry removing some at https://ms.portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps" + `
+               " or by running the following command to remove apps created by this script:" + `
+               "`n    Get-AzADApplication -DisplayNameStartsWith '$baseName' | Remove-AzADApplication" + `
+               "`nNOTE: You may need to wait for the quota number to be updated after removing unused applications."
+        Write-Warning $msg
+        throw
     }
+
     $spPassword = ""
     $appId = ""
     if (Get-Member -Name "Secret" -InputObject $servicePrincipal -MemberType property) {
@@ -223,7 +247,7 @@ function BuildBicepFile([System.IO.FileSystemInfo] $file)
     }
 
     $tmp = $env:TEMP ? $env:TEMP : [System.IO.Path]::GetTempPath()
-    $templateFilePath = Join-Path $tmp "test-resources.$(New-Guid).compiled.json"
+    $templateFilePath = Join-Path $tmp "$ResourceType-resources.$(New-Guid).compiled.json"
 
     # Az can deploy bicep files natively, but by compiling here it becomes easier to parse the
     # outputted json for mismatched parameter declarations.
@@ -347,9 +371,17 @@ try {
     # Enumerate test resources to deploy. Fail if none found.
     $repositoryRoot = "$PSScriptRoot/../../.." | Resolve-Path
     $root = [System.IO.Path]::Combine($repositoryRoot, "sdk", $ServiceDirectory) | Resolve-Path
+    if ($TestResourcesDirectory) {
+        $root = $TestResourcesDirectory | Resolve-Path
+        # Add an explicit check below in case ErrorActionPreference is overridden and Resolve-Path doesn't stop execution
+        if (!$root) {
+            throw "TestResourcesDirectory '$TestResourcesDirectory' does not exist."
+        }
+        Write-Verbose "Overriding test resources search directory to '$root'"
+    }
     $templateFiles = @()
 
-    'test-resources.json', 'test-resources.bicep' | ForEach-Object {
+    "$ResourceType-resources.json", "$ResourceType-resources.bicep" | ForEach-Object {
         Write-Verbose "Checking for '$_' files under '$root'"
         Get-ChildItem -Path $root -Filter "$_" -Recurse | ForEach-Object {
             Write-Verbose "Found template '$($_.FullName)'"
@@ -368,17 +400,16 @@ try {
         exit
     }
 
-    $UserName =  if ($env:USER) { $env:USER } else { "${env:USERNAME}" }
-    # Remove spaces, etc. that may be in $UserName
-    $UserName = $UserName -replace '\W'
+    $UserName = GetUserName
 
-    # Make sure $BaseName is set.
-    if ($CI) {
-        $BaseName = 't' + (New-Guid).ToString('n').Substring(0, 16)
-        Log "Generated base name '$BaseName' for CI build"
-    } elseif (!$BaseName) {
-        $BaseName = "$UserName$ServiceDirectory"
-        Log "BaseName was not set. Using default base name '$BaseName'"
+    if (!$BaseName) {
+        if ($CI) {
+            $BaseName = 't' + (New-Guid).ToString('n').Substring(0, 16)
+            Log "Generated base name '$BaseName' for CI build"
+        } else {
+            $BaseName = GetBaseName $UserName (GetServiceLeafDirectoryName $ServiceDirectory)
+            Log "BaseName was not set. Using default base name '$BaseName'"
+        }
     }
 
     # Make sure pre- and post-scripts are passed formerly required arguments.
@@ -398,7 +429,7 @@ try {
     # string.
     if (!$Location) {
         $Location = @{
-            'AzureCloud' = 'westus2';
+            'AzureCloud' = 'westus';
             'AzureUSGovernment' = 'usgovvirginia';
             'AzureChinaCloud' = 'chinaeast2';
             'Dogfood' = 'westus'
@@ -515,19 +546,13 @@ try {
         $ProvisionerApplicationOid = $sp.Id
     }
 
-    # If the ServiceDirectory has multiple segments use the last directory name
-    # e.g. D:\foo\bar -> bar or foo/bar -> bar
-    $serviceName = if (Split-Path $ServiceDirectory) {
-        Split-Path -Leaf $ServiceDirectory
-    } else {
-        $ServiceDirectory.Trim('/')
-    }
+    $serviceName = GetServiceLeafDirectoryName $ServiceDirectory
 
     $ResourceGroupName = if ($ResourceGroupName) {
         $ResourceGroupName
     } elseif ($CI) {
         # Format the resource group name based on resource group naming recommendations and limitations.
-        "rg-{0}-$BaseName" -f ($serviceName -replace '[\\\/:]', '-').Substring(0, [Math]::Min($serviceName.Length, 90 - $BaseName.Length - 4)).Trim('-')
+        "rg-{0}-$BaseName" -f ($serviceName -replace '[\.\\\/:]', '-').ToLowerInvariant().Substring(0, [Math]::Min($serviceName.Length, 90 - $BaseName.Length - 4)).Trim('-')
     } else {
         "rg-$BaseName"
     }
@@ -551,16 +576,12 @@ try {
             BuildReason = "${env:BUILD_REASON}"
         }
 
-        # Set the resource group name variable.
-        Write-Host "Setting variable 'AZURE_RESOURCEGROUP_NAME': $ResourceGroupName"
-        LogVsoCommand "##vso[task.setvariable variable=AZURE_RESOURCEGROUP_NAME;]$ResourceGroupName"
-        if ($EnvironmentVariables.ContainsKey('AZURE_RESOURCEGROUP_NAME') -and `
-            $EnvironmentVariables['AZURE_RESOURCEGROUP_NAME'] -ne $ResourceGroupName)
-        {
-            Write-Warning ("Overwriting 'EnvironmentVariables.AZURE_RESOURCEGROUP_NAME' with value " +
-                "'$($EnvironmentVariables['AZURE_RESOURCEGROUP_NAME'])' " + "to new value '$($ResourceGroupName)'")
-        }
-        $EnvironmentVariables['AZURE_RESOURCEGROUP_NAME'] = $ResourceGroupName
+        # Set an environment variable marking that resources have been deployed
+        # This variable can be consumed as a yaml condition in later stages of the pipeline
+        # to determine whether resources should be removed.
+        Write-Host "Setting variable 'CI_HAS_DEPLOYED_RESOURCES': 'true'"
+        LogVsoCommand "##vso[task.setvariable variable=CI_HAS_DEPLOYED_RESOURCES;]true"
+        $EnvironmentVariables['CI_HAS_DEPLOYED_RESOURCES'] = $true
     }
 
     Log "Creating resource group '$ResourceGroupName' in location '$Location'"
@@ -597,9 +618,9 @@ try {
             # Service principals in the Microsoft AAD tenant must end with an @microsoft.com domain; those in other tenants
             # are not permitted to do so. Format the non-MS name so there's an assocation with the Azure SDK.
             if ($TenantId -eq '72f988bf-86f1-41af-91ab-2d7cd011db47') {
-                $displayName = "test-resources-$($baseName)$suffix.microsoft.com"
+                $displayName = "$ResourceType-resources-$($baseName)$suffix.microsoft.com"
             } else {
-                $displayName = "$($baseName)$suffix.test-resources.azure.sdk"
+                $displayName = "$($baseName)$suffix.$ResourceType-resources.azure.sdk"
             }
 
             $servicePrincipalWrapper = NewServicePrincipalWrapper -subscription $SubscriptionId -resourceGroup $ResourceGroupName -displayName $DisplayName
@@ -716,7 +737,7 @@ try {
             }
         }
 
-        $preDeploymentScript = $templateFile.originalFilePath | Split-Path | Join-Path -ChildPath 'test-resources-pre.ps1'
+        $preDeploymentScript = $templateFile.originalFilePath | Split-Path | Join-Path -ChildPath "$ResourceType-resources-pre.ps1"
         if (Test-Path $preDeploymentScript) {
             Log "Invoking pre-deployment script '$preDeploymentScript'"
             &$preDeploymentScript -ResourceGroupName $ResourceGroupName @PSBoundParameters
@@ -730,33 +751,31 @@ try {
         Log $msg
 
         $deployment = Retry {
-            $lastDebugPreference = $DebugPreference
-            try {
-                if ($CI) {
-                    $DebugPreference = 'Continue'
-                }
-                New-AzResourceGroupDeployment -Name $BaseName -ResourceGroupName $resourceGroup.ResourceGroupName -TemplateFile $templateFile.jsonFilePath -TemplateParameterObject $templateFileParameters -Force:$Force
-            } catch {
-                Write-Output @'
-#####################################################
-# For help debugging live test provisioning issues, #
-# see http://aka.ms/azsdk/engsys/live-test-help,    #
-#####################################################
-'@
-                throw
-            } finally {
-                $DebugPreference = $lastDebugPreference
-            }
+            New-AzResourceGroupDeployment `
+                    -Name $BaseName `
+                    -ResourceGroupName $resourceGroup.ResourceGroupName `
+                    -TemplateFile $templateFile.jsonFilePath `
+                    -TemplateParameterObject $templateFileParameters `
+                    -Force:$Force
         }
 
-        if ($deployment.ProvisioningState -eq 'Succeeded') {
-            # New-AzResourceGroupDeployment would've written an error and stopped the pipeline by default anyway.
-            Write-Verbose "Successfully deployed template '$($templateFile.jsonFilePath)' to resource group '$($resourceGroup.ResourceGroupName)'"
+        if ($deployment.ProvisioningState -ne 'Succeeded') {
+            Write-Host "Deployment '$($deployment.DeploymentName)' has state '$($deployment.ProvisioningState)' with CorrelationId '$($deployment.CorrelationId)'. Exiting..."
+            Write-Host @'
+#####################################################
+# For help debugging live test provisioning issues, #
+# see http://aka.ms/azsdk/engsys/live-test-help     #
+#####################################################
+'@
+            exit 1
         }
+
+        Write-Host "Deployment '$($deployment.DeploymentName)' has CorrelationId '$($deployment.CorrelationId)'"
+        Write-Host "Successfully deployed template '$($templateFile.jsonFilePath)' to resource group '$($resourceGroup.ResourceGroupName)'"
 
         $deploymentOutputs = SetDeploymentOutputs $serviceName $context $deployment $templateFile
 
-        $postDeploymentScript = $templateFile.originalFilePath | Split-Path | Join-Path -ChildPath 'test-resources-post.ps1'
+        $postDeploymentScript = $templateFile.originalFilePath | Split-Path | Join-Path -ChildPath "$ResourceType-resources-post.ps1"
         if (Test-Path $postDeploymentScript) {
             Log "Invoking post-deployment script '$postDeploymentScript'"
             &$postDeploymentScript -ResourceGroupName $ResourceGroupName -DeploymentOutputs $deploymentOutputs @PSBoundParameters
@@ -818,7 +837,13 @@ group that will be created.
 .PARAMETER ServiceDirectory
 A directory under 'sdk' in the repository root - optionally with subdirectories
 specified - in which to discover ARM templates named 'test-resources.json' and
-Bicep templates named 'test-resources.bicep'. This can also be an absolute path
+Bicep templates named 'test-resources.bicep'. This can be an absolute path
+or specify parent directories. ServiceDirectory is also used for resource and
+environment variable naming.
+
+.PARAMETER TestResourcesDirectory
+An override directory in which to discover ARM templates named 'test-resources.json' and
+Bicep templates named 'test-resources.bicep'. This can be an absolute path
 or specify parent directories.
 
 .PARAMETER TestApplicationId
@@ -914,7 +939,7 @@ This is used for CI automation.
 Optional location where resources should be created. If left empty, the default
 is based on the cloud to which the template is being deployed:
 
-* AzureCloud -> 'westus2'
+* AzureCloud -> 'westus'
 * AzureUSGovernment -> 'usgovvirginia'
 * AzureChinaCloud -> 'chinaeast2'
 * Dogfood -> 'westus'
@@ -1029,7 +1054,6 @@ the SecureString to plaintext by another means.
 
 .EXAMPLE
 New-TestResources.ps1 `
-    -BaseName 'Generated' `
     -ServiceDirectory '$(ServiceDirectory)' `
     -TenantId '$(TenantId)' `
     -ProvisionerApplicationId '$(ProvisionerId)' `

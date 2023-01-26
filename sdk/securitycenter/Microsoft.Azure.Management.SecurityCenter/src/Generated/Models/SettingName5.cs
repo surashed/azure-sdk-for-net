@@ -19,6 +19,7 @@ namespace Microsoft.Azure.Management.Security.Models
         public const string MCAS = "MCAS";
         public const string WDATP = "WDATP";
         public const string WDATPEXCLUDELINUXPUBLICPREVIEW = "WDATP_EXCLUDE_LINUX_PUBLIC_PREVIEW";
+        public const string WDATPUNIFIEDSOLUTION = "WDATP_UNIFIED_SOLUTION";
         public const string Sentinel = "Sentinel";
     }
 }

@@ -31,8 +31,8 @@ namespace Microsoft.Azure.Management.Security.Models
         /// Initializes a new instance of the
         /// DefenderForContainersAwsOfferingCloudWatchToKinesis class.
         /// </summary>
-        /// <param name="cloudRoleArn">The cloud role ARN in AWS for this
-        /// feature</param>
+        /// <param name="cloudRoleArn">The cloud role ARN in AWS used by
+        /// CloudWatch to transfer data into Kinesis</param>
         public DefenderForContainersAwsOfferingCloudWatchToKinesis(string cloudRoleArn = default(string))
         {
             CloudRoleArn = cloudRoleArn;
@@ -45,7 +45,8 @@ namespace Microsoft.Azure.Management.Security.Models
         partial void CustomInit();
 
         /// <summary>
-        /// Gets or sets the cloud role ARN in AWS for this feature
+        /// Gets or sets the cloud role ARN in AWS used by CloudWatch to
+        /// transfer data into Kinesis
         /// </summary>
         [JsonProperty(PropertyName = "cloudRoleArn")]
         public string CloudRoleArn { get; set; }

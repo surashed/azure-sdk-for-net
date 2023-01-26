@@ -316,6 +316,61 @@ namespace Microsoft.Azure.Management.Security
         public virtual ISecurityConnectorsOperations SecurityConnectors { get; private set; }
 
         /// <summary>
+        /// Gets the IGovernanceRuleOperations.
+        /// </summary>
+        public virtual IGovernanceRuleOperations GovernanceRule { get; private set; }
+
+        /// <summary>
+        /// Gets the IGovernanceRulesOperations.
+        /// </summary>
+        public virtual IGovernanceRulesOperations GovernanceRules { get; private set; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRuleOperations.
+        /// </summary>
+        public virtual ISecurityConnectorGovernanceRuleOperations SecurityConnectorGovernanceRule { get; private set; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRulesOperations.
+        /// </summary>
+        public virtual ISecurityConnectorGovernanceRulesOperations SecurityConnectorGovernanceRules { get; private set; }
+
+        /// <summary>
+        /// Gets the ISubscriptionGovernanceRulesExecuteStatusOperations.
+        /// </summary>
+        public virtual ISubscriptionGovernanceRulesExecuteStatusOperations SubscriptionGovernanceRulesExecuteStatus { get; private set; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRulesExecuteStatusOperations.
+        /// </summary>
+        public virtual ISecurityConnectorGovernanceRulesExecuteStatusOperations SecurityConnectorGovernanceRulesExecuteStatus { get; private set; }
+
+        /// <summary>
+        /// Gets the IGovernanceAssignmentsOperations.
+        /// </summary>
+        public virtual IGovernanceAssignmentsOperations GovernanceAssignments { get; private set; }
+
+        /// <summary>
+        /// Gets the IApplicationsOperations.
+        /// </summary>
+        public virtual IApplicationsOperations Applications { get; private set; }
+
+        /// <summary>
+        /// Gets the IApplicationOperations.
+        /// </summary>
+        public virtual IApplicationOperations Application { get; private set; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorApplicationsOperations.
+        /// </summary>
+        public virtual ISecurityConnectorApplicationsOperations SecurityConnectorApplications { get; private set; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorApplicationOperations.
+        /// </summary>
+        public virtual ISecurityConnectorApplicationOperations SecurityConnectorApplication { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the SecurityCenterClient class.
         /// </summary>
         /// <param name='httpClient'>
@@ -605,6 +660,17 @@ namespace Microsoft.Azure.Management.Security
             IngestionSettings = new IngestionSettingsOperations(this);
             SoftwareInventories = new SoftwareInventoriesOperations(this);
             SecurityConnectors = new SecurityConnectorsOperations(this);
+            GovernanceRule = new GovernanceRuleOperations(this);
+            GovernanceRules = new GovernanceRulesOperations(this);
+            SecurityConnectorGovernanceRule = new SecurityConnectorGovernanceRuleOperations(this);
+            SecurityConnectorGovernanceRules = new SecurityConnectorGovernanceRulesOperations(this);
+            SubscriptionGovernanceRulesExecuteStatus = new SubscriptionGovernanceRulesExecuteStatusOperations(this);
+            SecurityConnectorGovernanceRulesExecuteStatus = new SecurityConnectorGovernanceRulesExecuteStatusOperations(this);
+            GovernanceAssignments = new GovernanceAssignmentsOperations(this);
+            Applications = new ApplicationsOperations(this);
+            Application = new ApplicationOperations(this);
+            SecurityConnectorApplications = new SecurityConnectorApplicationsOperations(this);
+            SecurityConnectorApplication = new SecurityConnectorApplicationOperations(this);
             BaseUri = new System.Uri("https://management.azure.com");
             AcceptLanguage = "en-US";
             LongRunningOperationRetryTimeout = 30;
@@ -655,6 +721,12 @@ namespace Microsoft.Azure.Management.Security
             DeserializationSettings.Converters.Add(new PolymorphicDeserializeJsonConverter<Setting>("kind"));
             SerializationSettings.Converters.Add(new PolymorphicSerializeJsonConverter<CloudOffering>("offeringType"));
             DeserializationSettings.Converters.Add(new PolymorphicDeserializeJsonConverter<CloudOffering>("offeringType"));
+            SerializationSettings.Converters.Add(new PolymorphicSerializeJsonConverter<EnvironmentData>("environmentType"));
+            DeserializationSettings.Converters.Add(new PolymorphicDeserializeJsonConverter<EnvironmentData>("environmentType"));
+            SerializationSettings.Converters.Add(new PolymorphicSerializeJsonConverter<AwsOrganizationalData>("organizationMembershipType"));
+            DeserializationSettings.Converters.Add(new PolymorphicDeserializeJsonConverter<AwsOrganizationalData>("organizationMembershipType"));
+            SerializationSettings.Converters.Add(new PolymorphicSerializeJsonConverter<GcpOrganizationalData>("organizationMembershipType"));
+            DeserializationSettings.Converters.Add(new PolymorphicDeserializeJsonConverter<GcpOrganizationalData>("organizationMembershipType"));
             CustomInitialize();
             DeserializationSettings.Converters.Add(new TransformationJsonConverter());
             DeserializationSettings.Converters.Add(new CloudErrorJsonConverter());

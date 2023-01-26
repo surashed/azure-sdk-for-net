@@ -19,5 +19,7 @@ namespace Microsoft.Azure.Management.Security.Models
         public const string Azure = "Azure";
         public const string AWS = "AWS";
         public const string GCP = "GCP";
+        public const string Github = "Github";
+        public const string AzureDevOps = "AzureDevOps";
     }
 }

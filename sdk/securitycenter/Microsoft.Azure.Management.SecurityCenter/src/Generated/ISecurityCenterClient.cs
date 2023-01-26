@@ -310,5 +310,60 @@ namespace Microsoft.Azure.Management.Security
         /// </summary>
         ISecurityConnectorsOperations SecurityConnectors { get; }
 
+        /// <summary>
+        /// Gets the IGovernanceRuleOperations.
+        /// </summary>
+        IGovernanceRuleOperations GovernanceRule { get; }
+
+        /// <summary>
+        /// Gets the IGovernanceRulesOperations.
+        /// </summary>
+        IGovernanceRulesOperations GovernanceRules { get; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRuleOperations.
+        /// </summary>
+        ISecurityConnectorGovernanceRuleOperations SecurityConnectorGovernanceRule { get; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRulesOperations.
+        /// </summary>
+        ISecurityConnectorGovernanceRulesOperations SecurityConnectorGovernanceRules { get; }
+
+        /// <summary>
+        /// Gets the ISubscriptionGovernanceRulesExecuteStatusOperations.
+        /// </summary>
+        ISubscriptionGovernanceRulesExecuteStatusOperations SubscriptionGovernanceRulesExecuteStatus { get; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorGovernanceRulesExecuteStatusOperations.
+        /// </summary>
+        ISecurityConnectorGovernanceRulesExecuteStatusOperations SecurityConnectorGovernanceRulesExecuteStatus { get; }
+
+        /// <summary>
+        /// Gets the IGovernanceAssignmentsOperations.
+        /// </summary>
+        IGovernanceAssignmentsOperations GovernanceAssignments { get; }
+
+        /// <summary>
+        /// Gets the IApplicationsOperations.
+        /// </summary>
+        IApplicationsOperations Applications { get; }
+
+        /// <summary>
+        /// Gets the IApplicationOperations.
+        /// </summary>
+        IApplicationOperations Application { get; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorApplicationsOperations.
+        /// </summary>
+        ISecurityConnectorApplicationsOperations SecurityConnectorApplications { get; }
+
+        /// <summary>
+        /// Gets the ISecurityConnectorApplicationOperations.
+        /// </summary>
+        ISecurityConnectorApplicationOperations SecurityConnectorApplication { get; }
+
     }
 }

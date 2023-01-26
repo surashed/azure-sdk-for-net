@@ -18,10 +18,10 @@ namespace Azure.ResourceManager.Resources.Models
         void IUtf8JsonSerializable.Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            if (Optional.IsDefined(ArmDeploymentScriptManagedIdentityType))
+            if (Optional.IsDefined(IdentityType))
             {
                 writer.WritePropertyName("type");
-                writer.WriteStringValue(ArmDeploymentScriptManagedIdentityType.Value.ToString());
+                writer.WriteStringValue(IdentityType.Value.ToString());
             }
             if (Optional.IsCollectionDefined(UserAssignedIdentities))
             {
@@ -74,7 +74,7 @@ namespace Azure.ResourceManager.Resources.Models
                     Dictionary<string, UserAssignedIdentity> dictionary = new Dictionary<string, UserAssignedIdentity>();
                     foreach (var property0 in property.Value.EnumerateObject())
                     {
-                        dictionary.Add(property0.Name, JsonSerializer.Deserialize<UserAssignedIdentity>(property0.Value.ToString()));
+                        dictionary.Add(property0.Name, JsonSerializer.Deserialize<UserAssignedIdentity>(property0.Value.GetRawText()));
                     }
                     userAssignedIdentities = dictionary;
                     continue;

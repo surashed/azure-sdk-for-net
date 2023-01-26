@@ -47,21 +47,27 @@ namespace Microsoft.Azure.Management.Security.Models
         /// <param name="systemData">Azure Resource Manager metadata containing
         /// createdBy and modifiedBy information.</param>
         /// <param name="hierarchyIdentifier">The multi cloud resource
-        /// identifier (account id in case of AWS connector).</param>
-        /// <param name="cloudName">The multi cloud resource's cloud name.
-        /// Possible values include: 'Azure', 'AWS', 'GCP'</param>
+        /// identifier (account id in case of AWS connector, project number in
+        /// case of GCP connector).</param>
+        /// <param name="hierarchyIdentifierTrialEndDate">The date on which the
+        /// trial period will end, if applicable. Trial period exists for 30
+        /// days after upgrading to payed offerings.</param>
+        /// <param name="environmentName">The multi cloud resource's cloud
+        /// name. Possible values include: 'Azure', 'AWS', 'GCP', 'Github',
+        /// 'AzureDevOps'</param>
         /// <param name="offerings">A collection of offerings for the security
         /// connector.</param>
-        /// <param name="organizationalData">The multi cloud account's
-        /// organizational data</param>
-        public SecurityConnector(string id = default(string), string name = default(string), string type = default(string), string location = default(string), string kind = default(string), string etag = default(string), IDictionary<string, string> tags = default(IDictionary<string, string>), SystemData systemData = default(SystemData), string hierarchyIdentifier = default(string), string cloudName = default(string), IList<CloudOffering> offerings = default(IList<CloudOffering>), SecurityConnectorPropertiesOrganizationalData organizationalData = default(SecurityConnectorPropertiesOrganizationalData))
+        /// <param name="environmentData">The security connector environment
+        /// data.</param>
+        public SecurityConnector(string id = default(string), string name = default(string), string type = default(string), string location = default(string), string kind = default(string), string etag = default(string), IDictionary<string, string> tags = default(IDictionary<string, string>), SystemData systemData = default(SystemData), string hierarchyIdentifier = default(string), System.DateTime? hierarchyIdentifierTrialEndDate = default(System.DateTime?), string environmentName = default(string), IList<CloudOffering> offerings = default(IList<CloudOffering>), EnvironmentData environmentData = default(EnvironmentData))
             : base(id, name, type, location, kind, etag, tags)
         {
             SystemData = systemData;
             HierarchyIdentifier = hierarchyIdentifier;
-            CloudName = cloudName;
+            HierarchyIdentifierTrialEndDate = hierarchyIdentifierTrialEndDate;
+            EnvironmentName = environmentName;
             Offerings = offerings;
-            OrganizationalData = organizationalData;
+            EnvironmentData = environmentData;
             CustomInit();
         }
 
@@ -79,17 +85,24 @@ namespace Microsoft.Azure.Management.Security.Models
 
         /// <summary>
         /// Gets or sets the multi cloud resource identifier (account id in
-        /// case of AWS connector).
+        /// case of AWS connector, project number in case of GCP connector).
         /// </summary>
         [JsonProperty(PropertyName = "properties.hierarchyIdentifier")]
         public string HierarchyIdentifier { get; set; }
 
         /// <summary>
-        /// Gets or sets the multi cloud resource's cloud name. Possible values
-        /// include: 'Azure', 'AWS', 'GCP'
+        /// Gets the date on which the trial period will end, if applicable.
+        /// Trial period exists for 30 days after upgrading to payed offerings.
         /// </summary>
-        [JsonProperty(PropertyName = "properties.cloudName")]
-        public string CloudName { get; set; }
+        [JsonProperty(PropertyName = "properties.hierarchyIdentifierTrialEndDate")]
+        public System.DateTime? HierarchyIdentifierTrialEndDate { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the multi cloud resource's cloud name. Possible values
+        /// include: 'Azure', 'AWS', 'GCP', 'Github', 'AzureDevOps'
+        /// </summary>
+        [JsonProperty(PropertyName = "properties.environmentName")]
+        public string EnvironmentName { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of offerings for the security connector.
@@ -98,10 +111,10 @@ namespace Microsoft.Azure.Management.Security.Models
         public IList<CloudOffering> Offerings { get; set; }
 
         /// <summary>
-        /// Gets or sets the multi cloud account's organizational data
+        /// Gets or sets the security connector environment data.
         /// </summary>
-        [JsonProperty(PropertyName = "properties.organizationalData")]
-        public SecurityConnectorPropertiesOrganizationalData OrganizationalData { get; set; }
+        [JsonProperty(PropertyName = "properties.environmentData")]
+        public EnvironmentData EnvironmentData { get; set; }
 
     }
 }

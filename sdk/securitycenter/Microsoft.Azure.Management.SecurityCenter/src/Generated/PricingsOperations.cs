@@ -51,7 +51,8 @@ namespace Microsoft.Azure.Management.Security
         public SecurityCenterClient Client { get; private set; }
 
         /// <summary>
-        /// Lists Security Center pricing configurations in the subscription.
+        /// Lists Microsoft Defender for Cloud pricing configurations in the
+        /// subscription.
         /// </summary>
         /// <param name='customHeaders'>
         /// Headers that will be added to request.
@@ -234,7 +235,8 @@ namespace Microsoft.Azure.Management.Security
         }
 
         /// <summary>
-        /// Gets a provided Security Center pricing configuration in the subscription.
+        /// Gets a provided Microsoft Defender for Cloud pricing configuration in the
+        /// subscription.
         /// </summary>
         /// <param name='pricingName'>
         /// name of the pricing configuration
@@ -426,18 +428,23 @@ namespace Microsoft.Azure.Management.Security
         }
 
         /// <summary>
-        /// Updates a provided Security Center pricing configuration in the
-        /// subscription.
+        /// Updates a provided Microsoft Defender for Cloud pricing configuration in
+        /// the subscription.
         /// </summary>
         /// <param name='pricingName'>
         /// name of the pricing configuration
         /// </param>
         /// <param name='pricingTier'>
-        /// The pricing tier value. Azure Security Center is provided in two pricing
-        /// tiers: free and standard, with the standard tier available with a trial
-        /// period. The standard tier offers advanced security capabilities, while the
-        /// free tier offers basic security features. Possible values include: 'Free',
-        /// 'Standard'
+        /// The pricing tier value. Microsoft Defender for Cloud is provided in two
+        /// pricing tiers: free and standard, with the standard tier available with a
+        /// trial period. The standard tier offers advanced security capabilities,
+        /// while the free tier offers basic security features. Possible values
+        /// include: 'Free', 'Standard'
+        /// </param>
+        /// <param name='subPlan'>
+        /// The sub-plan selected for a Standard pricing configuration, when more than
+        /// one sub-plan is available. Each sub-plan enables a set of security
+        /// features. When not specified, full plan is applied.
         /// </param>
         /// <param name='subPlan'>
         /// The sub-plan selected for a Standard pricing configuration, when more than

@@ -29,9 +29,9 @@ namespace Azure.ResourceManager.Resources.Tests.Samples
             ArmDeploymentCollection ArmDeploymentCollection = resourceGroup.GetArmDeployments();
             // Use the same location as the resource group
             string deploymentName = "myDeployment";
-            var input = new ArmDeploymentInput(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
+            var input = new ArmDeploymentContent(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
             {
-                TemplateLink = new TemplateLink()
+                TemplateLink = new ArmDeploymentTemplateLink()
                 {
                     Uri = new Uri("https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/quickstarts/microsoft.storage/storage-account-create/azuredeploy.json")
                 },
@@ -62,10 +62,11 @@ namespace Azure.ResourceManager.Resources.Tests.Samples
             var parametersObject = new { storageAccountType = new { value = "Standard_GRS" } };
             //convert this object to JsonElement
             var parametersString = JsonSerializer.Serialize(parametersObject);
-            var parameters = JsonDocument.Parse(parametersString).RootElement;
-            var input = new ArmDeploymentInput(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
+            using var jsonDocument = JsonDocument.Parse(parametersString);
+            var parameters = jsonDocument.RootElement;
+            var input = new ArmDeploymentContent(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
             {
-                TemplateLink = new TemplateLink()
+                TemplateLink = new ArmDeploymentTemplateLink()
                 {
                     Uri = new Uri("https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/quickstarts/microsoft.storage/storage-account-create/azuredeploy.json")
                 },
@@ -86,7 +87,7 @@ namespace Azure.ResourceManager.Resources.Tests.Samples
             // Use the same location as the resource group
             string deploymentName = "myDeployment";
             // Passing string to template and parameters
-            var input = new ArmDeploymentInput(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
+            var input = new ArmDeploymentContent(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
             {
                 Template = BinaryData.FromString(File.ReadAllText("storage-template.json")),
                 Parameters = BinaryData.FromString(File.ReadAllText("storage-parameters.json"))

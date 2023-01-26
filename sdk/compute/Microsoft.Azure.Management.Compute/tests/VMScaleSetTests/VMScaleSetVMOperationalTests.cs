@@ -124,7 +124,7 @@ namespace Compute.Tests
                 Assert.True(listResponse.Count() == inputVMScaleSet.Sku.Capacity);
 
                 m_CrpClient.VirtualMachineScaleSetVMs.Start(rgName, vmScaleSet.Name, instanceId);
-                m_CrpClient.VirtualMachineScaleSetVMs.Reimage(rgName, vmScaleSet.Name, instanceId, tempDisk: null);
+                m_CrpClient.VirtualMachineScaleSetVMs.Reimage(rgName, vmScaleSet.Name, instanceId);
 
                 if (hasManagedDisks)
                 {
@@ -206,7 +206,7 @@ namespace Compute.Tests
         /// Update VirtualMachineScaleVM to Attach Disk
         /// Delete RG
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Resources no longer exist")]
         public void TestVMScaleSetVMOperations_Put()
         {
             using (MockContext context = MockContext.Start(this.GetType()))

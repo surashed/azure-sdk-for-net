@@ -32,6 +32,11 @@ namespace Azure.ResourceManager.Compute.Models
                 writer.WritePropertyName("encryption");
                 writer.WriteObjectValue(Encryption);
             }
+            if (Optional.IsDefined(IsExcludedFromLatest))
+            {
+                writer.WritePropertyName("excludeFromLatest");
+                writer.WriteBooleanValue(IsExcludedFromLatest.Value);
+            }
             writer.WriteEndObject();
         }
 
@@ -39,8 +44,9 @@ namespace Azure.ResourceManager.Compute.Models
         {
             string name = default;
             Optional<int> regionalReplicaCount = default;
-            Optional<StorageAccountType> storageAccountType = default;
+            Optional<ImageStorageAccountType> storageAccountType = default;
             Optional<EncryptionImages> encryption = default;
+            Optional<bool> excludeFromLatest = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("name"))
@@ -65,7 +71,7 @@ namespace Azure.ResourceManager.Compute.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    storageAccountType = new StorageAccountType(property.Value.GetString());
+                    storageAccountType = new ImageStorageAccountType(property.Value.GetString());
                     continue;
                 }
                 if (property.NameEquals("encryption"))
@@ -78,8 +84,18 @@ namespace Azure.ResourceManager.Compute.Models
                     encryption = EncryptionImages.DeserializeEncryptionImages(property.Value);
                     continue;
                 }
+                if (property.NameEquals("excludeFromLatest"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    excludeFromLatest = property.Value.GetBoolean();
+                    continue;
+                }
             }
-            return new TargetRegion(name, Optional.ToNullable(regionalReplicaCount), Optional.ToNullable(storageAccountType), encryption.Value);
+            return new TargetRegion(name, Optional.ToNullable(regionalReplicaCount), Optional.ToNullable(storageAccountType), encryption.Value, Optional.ToNullable(excludeFromLatest));
         }
     }
 }

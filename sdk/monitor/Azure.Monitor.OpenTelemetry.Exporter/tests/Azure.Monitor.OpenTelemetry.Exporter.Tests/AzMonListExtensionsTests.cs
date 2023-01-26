@@ -1,7 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+#nullable disable // TODO: remove and fix errors
+
 using System.Collections.Generic;
+
+using Azure.Monitor.OpenTelemetry.Exporter.Internals;
+
 using Xunit;
 
 namespace Azure.Monitor.OpenTelemetry.Exporter.Tests

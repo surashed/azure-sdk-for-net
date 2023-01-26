@@ -9,8 +9,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
-using Azure.ResourceManager.Management;
-using Azure.ResourceManager.Management.Models;
+using Azure.Core;
+using Azure.ResourceManager.ManagementGroups;
+using Azure.ResourceManager.ManagementGroups.Models;
 
 namespace Azure.ResourceManager.Resources
 {
@@ -26,8 +27,16 @@ namespace Azure.ResourceManager.Resources
         /// <summary>
         /// Get the details of the management group.
         /// 
-        /// Request Path: /providers/Microsoft.Management/managementGroups/{groupId}
-        /// Operation Id: ManagementGroups_Get
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/providers/Microsoft.Management/managementGroups/{groupId}</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>ManagementGroups_Get</description>
+        /// </item>
+        /// </list>
         /// </summary>
         /// <param name="groupId"> Management Group ID. </param>
         /// <param name="expand"> The $expand=children query string parameter allows clients to request inclusion of children in the response payload.  $expand=path includes the path from the root group to the current group.  $expand=ancestors includes the ancestor Ids of the current group. </param>
@@ -37,6 +46,7 @@ namespace Azure.ResourceManager.Resources
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="groupId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="groupId"/> is null. </exception>
+        [ForwardsClientCalls]
         public virtual async Task<Response<ManagementGroupResource>> GetManagementGroupAsync(string groupId, ManagementGroupExpandType? expand = null, bool? recurse = null, string filter = null, string cacheControl = null, CancellationToken cancellationToken = default)
         {
             return await GetManagementGroups().GetAsync(groupId, expand, recurse, filter, cacheControl, cancellationToken).ConfigureAwait(false);
@@ -45,8 +55,16 @@ namespace Azure.ResourceManager.Resources
         /// <summary>
         /// Get the details of the management group.
         /// 
-        /// Request Path: /providers/Microsoft.Management/managementGroups/{groupId}
-        /// Operation Id: ManagementGroups_Get
+        /// <list type="bullet">
+        /// <item>
+        /// <term>Request Path</term>
+        /// <description>/providers/Microsoft.Management/managementGroups/{groupId}</description>
+        /// </item>
+        /// <item>
+        /// <term>Operation Id</term>
+        /// <description>ManagementGroups_Get</description>
+        /// </item>
+        /// </list>
         /// </summary>
         /// <param name="groupId"> Management Group ID. </param>
         /// <param name="expand"> The $expand=children query string parameter allows clients to request inclusion of children in the response payload.  $expand=path includes the path from the root group to the current group.  $expand=ancestors includes the ancestor Ids of the current group. </param>
@@ -56,6 +74,7 @@ namespace Azure.ResourceManager.Resources
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentException"> <paramref name="groupId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="ArgumentNullException"> <paramref name="groupId"/> is null. </exception>
+        [ForwardsClientCalls]
         public virtual Response<ManagementGroupResource> GetManagementGroup(string groupId, ManagementGroupExpandType? expand = null, bool? recurse = null, string filter = null, string cacheControl = null, CancellationToken cancellationToken = default)
         {
             return GetManagementGroups().Get(groupId, expand, recurse, filter, cacheControl, cancellationToken);

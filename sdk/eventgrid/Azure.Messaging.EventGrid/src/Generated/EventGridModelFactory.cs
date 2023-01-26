@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Azure.Messaging.EventGrid.Models;
 using Azure.Messaging.EventGrid.SystemEvents;
 
 namespace Azure.Messaging.EventGrid
@@ -208,6 +207,36 @@ namespace Azure.Messaging.EventGrid
         public static SubscriptionDeletedEventData SubscriptionDeletedEventData(string eventSubscriptionId = null)
         {
             return new SubscriptionDeletedEventData(eventSubscriptionId);
+        }
+
+        /// <summary> Initializes a new instance of DataBoxCopyStartedEventData. </summary>
+        /// <param name="serialNumber"> Serial Number of the device associated with the event. The list is comma separated if more than one serial number is associated. </param>
+        /// <param name="stageName"> Name of the current Stage. </param>
+        /// <param name="stageTime"> The time at which the stage happened. </param>
+        /// <returns> A new <see cref="SystemEvents.DataBoxCopyStartedEventData"/> instance for mocking. </returns>
+        public static DataBoxCopyStartedEventData DataBoxCopyStartedEventData(string serialNumber = null, DataBoxStageName? stageName = null, DateTimeOffset? stageTime = null)
+        {
+            return new DataBoxCopyStartedEventData(serialNumber, stageName, stageTime);
+        }
+
+        /// <summary> Initializes a new instance of DataBoxCopyCompletedEventData. </summary>
+        /// <param name="serialNumber"> Serial Number of the device associated with the event. The list is comma separated if more than one serial number is associated. </param>
+        /// <param name="stageName"> Name of the current Stage. </param>
+        /// <param name="stageTime"> The time at which the stage happened. </param>
+        /// <returns> A new <see cref="SystemEvents.DataBoxCopyCompletedEventData"/> instance for mocking. </returns>
+        public static DataBoxCopyCompletedEventData DataBoxCopyCompletedEventData(string serialNumber = null, DataBoxStageName? stageName = null, DateTimeOffset? stageTime = null)
+        {
+            return new DataBoxCopyCompletedEventData(serialNumber, stageName, stageTime);
+        }
+
+        /// <summary> Initializes a new instance of DataBoxOrderCompletedEventData. </summary>
+        /// <param name="serialNumber"> Serial Number of the device associated with the event. The list is comma separated if more than one serial number is associated. </param>
+        /// <param name="stageName"> Name of the current Stage. </param>
+        /// <param name="stageTime"> The time at which the stage happened. </param>
+        /// <returns> A new <see cref="SystemEvents.DataBoxOrderCompletedEventData"/> instance for mocking. </returns>
+        public static DataBoxOrderCompletedEventData DataBoxOrderCompletedEventData(string serialNumber = null, DataBoxStageName? stageName = null, DateTimeOffset? stageTime = null)
+        {
+            return new DataBoxOrderCompletedEventData(serialNumber, stageName, stageTime);
         }
 
         /// <summary> Initializes a new instance of DeviceLifeCycleEventProperties. </summary>
@@ -525,7 +554,11 @@ namespace Azure.Messaging.EventGrid
 
         /// <summary> Initializes a new instance of MediaJobOutputStateChangeEventData. </summary>
         /// <param name="previousState"> The previous state of the Job. </param>
-        /// <param name="output"> Gets the output. </param>
+        /// <param name="output">
+        /// Gets the output.
+        /// Please note <see cref="MediaJobOutput"/> is the base class. According to the scenario, a derived class of the base class might need to be assigned here, or this property needs to be casted to one of the possible derived classes.
+        /// The available derived classes include <see cref="MediaJobOutputAsset"/>.
+        /// </param>
         /// <param name="jobCorrelationData"> Gets the Job correlation data. </param>
         /// <returns> A new <see cref="SystemEvents.MediaJobOutputStateChangeEventData"/> instance for mocking. </returns>
         public static MediaJobOutputStateChangeEventData MediaJobOutputStateChangeEventData(MediaJobState? previousState = null, MediaJobOutput output = null, IReadOnlyDictionary<string, string> jobCorrelationData = null)
@@ -539,7 +572,11 @@ namespace Azure.Messaging.EventGrid
         /// <param name="previousState"> The previous state of the Job. </param>
         /// <param name="state"> The new state of the Job. </param>
         /// <param name="correlationData"> Gets the Job correlation data. </param>
-        /// <param name="outputs"> Gets the Job outputs. </param>
+        /// <param name="outputs">
+        /// Gets the Job outputs.
+        /// Please note <see cref="MediaJobOutput"/> is the base class. According to the scenario, a derived class of the base class might need to be assigned here, or this property needs to be casted to one of the possible derived classes.
+        /// The available derived classes include <see cref="MediaJobOutputAsset"/>.
+        /// </param>
         /// <returns> A new <see cref="SystemEvents.MediaJobFinishedEventData"/> instance for mocking. </returns>
         public static MediaJobFinishedEventData MediaJobFinishedEventData(MediaJobState? previousState = null, MediaJobState? state = null, IReadOnlyDictionary<string, string> correlationData = null, IEnumerable<MediaJobOutput> outputs = null)
         {
@@ -553,7 +590,11 @@ namespace Azure.Messaging.EventGrid
         /// <param name="previousState"> The previous state of the Job. </param>
         /// <param name="state"> The new state of the Job. </param>
         /// <param name="correlationData"> Gets the Job correlation data. </param>
-        /// <param name="outputs"> Gets the Job outputs. </param>
+        /// <param name="outputs">
+        /// Gets the Job outputs.
+        /// Please note <see cref="MediaJobOutput"/> is the base class. According to the scenario, a derived class of the base class might need to be assigned here, or this property needs to be casted to one of the possible derived classes.
+        /// The available derived classes include <see cref="MediaJobOutputAsset"/>.
+        /// </param>
         /// <returns> A new <see cref="SystemEvents.MediaJobCanceledEventData"/> instance for mocking. </returns>
         public static MediaJobCanceledEventData MediaJobCanceledEventData(MediaJobState? previousState = null, MediaJobState? state = null, IReadOnlyDictionary<string, string> correlationData = null, IEnumerable<MediaJobOutput> outputs = null)
         {
@@ -567,7 +608,11 @@ namespace Azure.Messaging.EventGrid
         /// <param name="previousState"> The previous state of the Job. </param>
         /// <param name="state"> The new state of the Job. </param>
         /// <param name="correlationData"> Gets the Job correlation data. </param>
-        /// <param name="outputs"> Gets the Job outputs. </param>
+        /// <param name="outputs">
+        /// Gets the Job outputs.
+        /// Please note <see cref="MediaJobOutput"/> is the base class. According to the scenario, a derived class of the base class might need to be assigned here, or this property needs to be casted to one of the possible derived classes.
+        /// The available derived classes include <see cref="MediaJobOutputAsset"/>.
+        /// </param>
         /// <returns> A new <see cref="SystemEvents.MediaJobErroredEventData"/> instance for mocking. </returns>
         public static MediaJobErroredEventData MediaJobErroredEventData(MediaJobState? previousState = null, MediaJobState? state = null, IReadOnlyDictionary<string, string> correlationData = null, IEnumerable<MediaJobOutput> outputs = null)
         {
@@ -1232,17 +1277,29 @@ namespace Azure.Messaging.EventGrid
 
         /// <summary> Initializes a new instance of CommunicationUserIdentifierModel. </summary>
         /// <param name="id"> The Id of the communication user. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="id"/> is null. </exception>
         /// <returns> A new <see cref="SystemEvents.CommunicationUserIdentifierModel"/> instance for mocking. </returns>
         public static CommunicationUserIdentifierModel CommunicationUserIdentifierModel(string id = null)
         {
+            if (id == null)
+            {
+                throw new ArgumentNullException(nameof(id));
+            }
+
             return new CommunicationUserIdentifierModel(id);
         }
 
         /// <summary> Initializes a new instance of PhoneNumberIdentifierModel. </summary>
         /// <param name="value"> The phone number in E.164 format. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="value"/> is null. </exception>
         /// <returns> A new <see cref="SystemEvents.PhoneNumberIdentifierModel"/> instance for mocking. </returns>
         public static PhoneNumberIdentifierModel PhoneNumberIdentifierModel(string value = null)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             return new PhoneNumberIdentifierModel(value);
         }
 
@@ -1655,14 +1712,14 @@ namespace Azure.Messaging.EventGrid
         /// <param name="recordingStorageInfo"> The details of recording storage information. </param>
         /// <param name="recordingStartTime"> The time at which the recording started. </param>
         /// <param name="recordingDurationMs"> The recording duration in milliseconds. </param>
-        /// <param name="recordingContentType"> The recording content type- AudioVideo, or Audio. </param>
-        /// <param name="recordingChannelType"> The recording  channel type - Mixed, Unmixed. </param>
-        /// <param name="recordingFormatType"> The recording format type - Mp4, Mp3, Wav. </param>
+        /// <param name="contentType"> The recording content type- AudioVideo, or Audio. </param>
+        /// <param name="channelType"> The recording  channel type - Mixed, Unmixed. </param>
+        /// <param name="formatType"> The recording format type - Mp4, Mp3, Wav. </param>
         /// <param name="sessionEndReason"> The reason for ending recording session. </param>
         /// <returns> A new <see cref="SystemEvents.AcsRecordingFileStatusUpdatedEventData"/> instance for mocking. </returns>
-        public static AcsRecordingFileStatusUpdatedEventData AcsRecordingFileStatusUpdatedEventData(AcsRecordingStorageInfoProperties recordingStorageInfo = null, DateTimeOffset? recordingStartTime = null, long? recordingDurationMs = null, RecordingContentType? recordingContentType = null, RecordingChannelType? recordingChannelType = null, RecordingFormatType? recordingFormatType = null, string sessionEndReason = null)
+        public static AcsRecordingFileStatusUpdatedEventData AcsRecordingFileStatusUpdatedEventData(AcsRecordingStorageInfoProperties recordingStorageInfo = null, DateTimeOffset? recordingStartTime = null, long? recordingDurationMs = null, AcsRecordingContentType? contentType = null, AcsRecordingChannelType? channelType = null, AcsRecordingFormatType? formatType = null, string sessionEndReason = null)
         {
-            return new AcsRecordingFileStatusUpdatedEventData(recordingStorageInfo, recordingStartTime, recordingDurationMs, recordingContentType, recordingChannelType, recordingFormatType, sessionEndReason);
+            return new AcsRecordingFileStatusUpdatedEventData(recordingStorageInfo, recordingStartTime, recordingDurationMs, contentType, channelType, formatType, sessionEndReason);
         }
 
         /// <summary> Initializes a new instance of AcsRecordingStorageInfoProperties. </summary>
@@ -1859,6 +1916,151 @@ namespace Azure.Messaging.EventGrid
         public static ApiManagementApiReleaseDeletedEventData ApiManagementApiReleaseDeletedEventData(string resourceUri = null)
         {
             return new ApiManagementApiReleaseDeletedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayCreatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayCreatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayCreatedEventData ApiManagementGatewayCreatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayCreatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayUpdatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayUpdatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayUpdatedEventData ApiManagementGatewayUpdatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayUpdatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayDeletedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayDeletedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayDeletedEventData ApiManagementGatewayDeletedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayDeletedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayHostnameConfigurationCreatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/hostnameConfigurations/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayHostnameConfigurationCreatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayHostnameConfigurationCreatedEventData ApiManagementGatewayHostnameConfigurationCreatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayHostnameConfigurationCreatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayHostnameConfigurationUpdatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/hostnameConfigurations/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayHostnameConfigurationUpdatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayHostnameConfigurationUpdatedEventData ApiManagementGatewayHostnameConfigurationUpdatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayHostnameConfigurationUpdatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayHostnameConfigurationDeletedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/hostnameConfigurations/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayHostnameConfigurationDeletedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayHostnameConfigurationDeletedEventData ApiManagementGatewayHostnameConfigurationDeletedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayHostnameConfigurationDeletedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayCertificateAuthorityCreatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/certificateAuthorities/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayCertificateAuthorityCreatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayCertificateAuthorityCreatedEventData ApiManagementGatewayCertificateAuthorityCreatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayCertificateAuthorityCreatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayCertificateAuthorityUpdatedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/certificateAuthorities/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayCertificateAuthorityUpdatedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayCertificateAuthorityUpdatedEventData ApiManagementGatewayCertificateAuthorityUpdatedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayCertificateAuthorityUpdatedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayCertificateAuthorityDeletedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/certificateAuthorities/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayCertificateAuthorityDeletedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayCertificateAuthorityDeletedEventData ApiManagementGatewayCertificateAuthorityDeletedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayCertificateAuthorityDeletedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayApiAddedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/apis/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayApiAddedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayApiAddedEventData ApiManagementGatewayApiAddedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayApiAddedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of ApiManagementGatewayApiRemovedEventData. </summary>
+        /// <param name="resourceUri"> The fully qualified ID of the resource that the compliance state change is for, including the resource name and resource type. Uses the format, `/subscriptions/&lt;SubscriptionID&gt;/resourceGroups/&lt;ResourceGroup&gt;/Microsoft.ApiManagement/service/&lt;ServiceName&gt;/gateways/&lt;GatewayName&gt;/apis/&lt;ResourceName&gt;`. </param>
+        /// <returns> A new <see cref="SystemEvents.ApiManagementGatewayApiRemovedEventData"/> instance for mocking. </returns>
+        public static ApiManagementGatewayApiRemovedEventData ApiManagementGatewayApiRemovedEventData(string resourceUri = null)
+        {
+            return new ApiManagementGatewayApiRemovedEventData(resourceUri);
+        }
+
+        /// <summary> Initializes a new instance of HealthcareFhirResourceCreatedEventData. </summary>
+        /// <param name="fhirResourceType"> Type of HL7 FHIR resource. </param>
+        /// <param name="fhirServiceHostName"> Domain name of FHIR account for this resource. </param>
+        /// <param name="fhirResourceId"> Id of HL7 FHIR resource. </param>
+        /// <param name="fhirResourceVersionId"> VersionId of HL7 FHIR resource. It changes when the resource is created, updated, or deleted(soft-deletion). </param>
+        /// <returns> A new <see cref="SystemEvents.HealthcareFhirResourceCreatedEventData"/> instance for mocking. </returns>
+        public static HealthcareFhirResourceCreatedEventData HealthcareFhirResourceCreatedEventData(HealthcareFhirResourceType? fhirResourceType = null, string fhirServiceHostName = null, string fhirResourceId = null, long? fhirResourceVersionId = null)
+        {
+            return new HealthcareFhirResourceCreatedEventData(fhirResourceType, fhirServiceHostName, fhirResourceId, fhirResourceVersionId);
+        }
+
+        /// <summary> Initializes a new instance of HealthcareFhirResourceUpdatedEventData. </summary>
+        /// <param name="fhirResourceType"> Type of HL7 FHIR resource. </param>
+        /// <param name="fhirServiceHostName"> Domain name of FHIR account for this resource. </param>
+        /// <param name="fhirResourceId"> Id of HL7 FHIR resource. </param>
+        /// <param name="fhirResourceVersionId"> VersionId of HL7 FHIR resource. It changes when the resource is created, updated, or deleted(soft-deletion). </param>
+        /// <returns> A new <see cref="SystemEvents.HealthcareFhirResourceUpdatedEventData"/> instance for mocking. </returns>
+        public static HealthcareFhirResourceUpdatedEventData HealthcareFhirResourceUpdatedEventData(HealthcareFhirResourceType? fhirResourceType = null, string fhirServiceHostName = null, string fhirResourceId = null, long? fhirResourceVersionId = null)
+        {
+            return new HealthcareFhirResourceUpdatedEventData(fhirResourceType, fhirServiceHostName, fhirResourceId, fhirResourceVersionId);
+        }
+
+        /// <summary> Initializes a new instance of HealthcareFhirResourceDeletedEventData. </summary>
+        /// <param name="fhirResourceType"> Type of HL7 FHIR resource. </param>
+        /// <param name="fhirServiceHostName"> Domain name of FHIR account for this resource. </param>
+        /// <param name="fhirResourceId"> Id of HL7 FHIR resource. </param>
+        /// <param name="fhirResourceVersionId"> VersionId of HL7 FHIR resource. It changes when the resource is created, updated, or deleted(soft-deletion). </param>
+        /// <returns> A new <see cref="SystemEvents.HealthcareFhirResourceDeletedEventData"/> instance for mocking. </returns>
+        public static HealthcareFhirResourceDeletedEventData HealthcareFhirResourceDeletedEventData(HealthcareFhirResourceType? fhirResourceType = null, string fhirServiceHostName = null, string fhirResourceId = null, long? fhirResourceVersionId = null)
+        {
+            return new HealthcareFhirResourceDeletedEventData(fhirResourceType, fhirServiceHostName, fhirResourceId, fhirResourceVersionId);
+        }
+
+        /// <summary> Initializes a new instance of HealthcareDicomImageCreatedEventData. </summary>
+        /// <param name="imageStudyInstanceUid"> Unique identifier for the Study. </param>
+        /// <param name="imageSeriesInstanceUid"> Unique identifier for the Series. </param>
+        /// <param name="imageSopInstanceUid"> Unique identifier for the DICOM Image. </param>
+        /// <param name="serviceHostName"> Domain name of the DICOM account for this image. </param>
+        /// <param name="sequenceNumber"> Sequence number of the DICOM Service within Azure Health Data Services. It is unique for every image creation and deletion within the service. </param>
+        /// <returns> A new <see cref="SystemEvents.HealthcareDicomImageCreatedEventData"/> instance for mocking. </returns>
+        public static HealthcareDicomImageCreatedEventData HealthcareDicomImageCreatedEventData(string imageStudyInstanceUid = null, string imageSeriesInstanceUid = null, string imageSopInstanceUid = null, string serviceHostName = null, long? sequenceNumber = null)
+        {
+            return new HealthcareDicomImageCreatedEventData(imageStudyInstanceUid, imageSeriesInstanceUid, imageSopInstanceUid, serviceHostName, sequenceNumber);
+        }
+
+        /// <summary> Initializes a new instance of HealthcareDicomImageDeletedEventData. </summary>
+        /// <param name="imageStudyInstanceUid"> Unique identifier for the Study. </param>
+        /// <param name="imageSeriesInstanceUid"> Unique identifier for the Series. </param>
+        /// <param name="imageSopInstanceUid"> Unique identifier for the DICOM Image. </param>
+        /// <param name="serviceHostName"> Host name of the DICOM account for this image. </param>
+        /// <param name="sequenceNumber"> Sequence number of the DICOM Service within Azure Health Data Services. It is unique for every image creation and deletion within the service. </param>
+        /// <returns> A new <see cref="SystemEvents.HealthcareDicomImageDeletedEventData"/> instance for mocking. </returns>
+        public static HealthcareDicomImageDeletedEventData HealthcareDicomImageDeletedEventData(string imageStudyInstanceUid = null, string imageSeriesInstanceUid = null, string imageSopInstanceUid = null, string serviceHostName = null, long? sequenceNumber = null)
+        {
+            return new HealthcareDicomImageDeletedEventData(imageStudyInstanceUid, imageSeriesInstanceUid, imageSopInstanceUid, serviceHostName, sequenceNumber);
         }
     }
 }

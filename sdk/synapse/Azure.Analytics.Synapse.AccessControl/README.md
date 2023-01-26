@@ -17,12 +17,12 @@ For the best development experience, developers should use the official Microsof
 Install the Azure Synapse Analytics access control client library for .NET with [NuGet](https://www.nuget.org/packages/Azure.Analytics.Synapse.AccessControl/):
 
 ```dotnetcli
-dotnet add package Azure.Analytics.Synapse.AccessControl --version 0.1.0-preview.1
+dotnet add package Azure.Analytics.Synapse.AccessControl --prerelease
 ```
 
 ### Prerequisites
 
-- **Azure Subscription:** To use Azure services, including Azure Synapse, you'll need a subscription. If you do not have an existing Azure account, you may sign up for a [free trial](https://azure.microsoft.com/free/dotnet/) or use your [Visual Studio Subscription](https://visualstudio.microsoft.com/subscriptions/) benefits when you [create an account](https://account.windowsazure.com/Home/Index).
+- **Azure Subscription:** To use Azure services, including Azure Synapse, you'll need a subscription. If you do not have an existing Azure account, you may sign up for a [free trial](https://azure.microsoft.com/free/dotnet/) or use your [Visual Studio Subscription](https://visualstudio.microsoft.com/subscriptions/) benefits when you [create an account]https://azure.microsoft.com/account).
 - An existing Azure Synapse workspace. If you need to create an Azure Synapse workspace, you can use the [Azure Portal](https://portal.azure.com/) or [Azure CLI](https://docs.microsoft.com/cli/azure).
 
 If you use the Azure CLI, the command looks like below:
@@ -47,8 +47,8 @@ You will also need a **workspace endpoint**, which you may see as "Development e
 Client secret credential authentication is being used in this getting started section but you can find more ways to authenticate with [Azure identity](https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/identity/Azure.Identity). To use the [DefaultAzureCredential](https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/identity/Azure.Identity#defaultazurecredential) provider shown below,
 or other credential providers provided with the Azure SDK, you should install the Azure.Identity package:
 
-```PowerShell
-Install-Package Azure.Identity
+```dotnetcli
+dotnet add package Azure.Identity
 ```
 
 ## Key concepts
@@ -108,9 +108,9 @@ RoleDefinitionsClient definitionsClient = new RoleDefinitionsClient(new Uri(endp
 First, you need to the determine the ID of the role you wish to assign, along with the ID of the principal you wish to assign that role.
 
 ```C# Snippet:PrepCreateRoleAssignment
-Response roleDefinitionsResponse = definitionsClient.GetRoleDefinitions(new());
+Response roleDefinitionsResponse = definitionsClient.GetRoleDefinitions(true);
 BinaryData roleDefinitionsContent = roleDefinitionsResponse.Content;
-JsonDocument roleDefinitionsJson = JsonDocument.Parse(roleDefinitionsContent.ToMemory());
+using JsonDocument roleDefinitionsJson = JsonDocument.Parse(roleDefinitionsContent.ToMemory());
 
 JsonElement adminRoleJson = roleDefinitionsJson.RootElement.EnumerateArray().
     Single(role => role.GetProperty("name").ToString() == "Synapse Administrator");
@@ -135,9 +135,9 @@ var roleAssignmentDetails = new
     scope = assignedScope
 };
 
-Response addedRoleAssignmentResponse = roleAssignmentsClient.CreateRoleAssignment(assignmentId, RequestContent.Create(roleAssignmentDetails));
+Response addedRoleAssignmentResponse = roleAssignmentsClient.CreateRoleAssignment(assignmentId, RequestContent.Create(roleAssignmentDetails), ContentType.ApplicationJson);
 BinaryData addedRoleAssignmentContent = addedRoleAssignmentResponse.Content;
-JsonDocument addedRoleAssignmentJson = JsonDocument.Parse(addedRoleAssignmentContent.ToMemory());
+using JsonDocument addedRoleAssignmentJson = JsonDocument.Parse(addedRoleAssignmentContent.ToMemory());
 string addedRoleAssignmentId = addedRoleAssignmentJson.RootElement.GetProperty("id").ToString();
 ```
 
@@ -148,7 +148,7 @@ You can retrieve the details of a role assignment by calling `GetRoleAssignmentB
 ```C# Snippet:RetrieveRoleAssignment
 Response roleAssignmentResponse = roleAssignmentsClient.GetRoleAssignmentById(addedRoleAssignmentId, new());
 BinaryData roleAssignmentContent = roleAssignmentResponse.Content;
-JsonDocument roleAssignmentJson = JsonDocument.Parse(roleAssignmentContent.ToMemory());
+using JsonDocument roleAssignmentJson = JsonDocument.Parse(roleAssignmentContent.ToMemory());
 string roleAssignmentRoleDefinitionId = roleAssignmentJson.RootElement.GetProperty("roleDefinitionId").ToString();
 string roleAssignmentPrincipalId = roleAssignmentJson.RootElement.GetProperty("principalId").ToString();
 Console.WriteLine($"Role {roleAssignmentRoleDefinitionId} is assigned to {roleAssignmentPrincipalId}.");
@@ -161,7 +161,7 @@ To enumerate all role assignments in the Synapse workspace you can call `ListRol
 ```C# Snippet:ListRoleAssignments
 Response roleAssignmentsResponse = roleAssignmentsClient.GetRoleAssignments();
 BinaryData roleAssignmentsContent = roleAssignmentsResponse.Content;
-JsonDocument roleAssignmentsJson = JsonDocument.Parse(roleAssignmentsContent.ToMemory());
+using JsonDocument roleAssignmentsJson = JsonDocument.Parse(roleAssignmentsContent.ToMemory());
 
 foreach (JsonElement assignmentJson in roleAssignmentsJson.RootElement.GetProperty("value").EnumerateArray())
 {

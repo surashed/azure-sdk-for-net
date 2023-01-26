@@ -1,55 +1,46 @@
-# Azure Azure.ResourceManager.ServiceBus Management client library for .NET
+# Microsoft Azure Service Bus management client library for .NET
 
-This package follows the [new Azure SDK guidelines](https://azure.github.io/azure-sdk/general_introduction.html) which provide a number of core capabilities that are shared amongst all Azure SDKs, including the intuitive Azure Identity library, an HTTP Pipeline with custom policies, error-handling, distributed tracing, and much more.
+Microsoft Azure Service Bus is a fully managed enterprise message broker with message queues and publish-subscribe topics (in a namespace). 
+
+This library supports managing Microsoft Azure Service Bus resources.
+
+This library follows the [new Azure SDK guidelines](https://azure.github.io/azure-sdk/general_introduction.html), and provides many core capabilities:
+
+    - Support MSAL.NET, Azure.Identity is out of box for supporting MSAL.NET.
+    - Support [OpenTelemetry](https://opentelemetry.io/) for distributed tracing.
+    - HTTP pipeline with custom policies.
+    - Better error-handling.
+    - Support uniform telemetry across all languages.
 
 ## Getting started 
 
 ### Install the package
 
-Install the Azure Azure.ResourceManager.ServiceBus management library for .NET with [NuGet](https://www.nuget.org/):
+Install the Microsoft Azure Service Bus management library for .NET with [NuGet](https://www.nuget.org/):
 
-```PowerShell
-Install-Package Azure.ResourceManager.ServiceBus -Version 1.0.0-beta.2 
+```dotnetcli
+dotnet add package Azure.ResourceManager.ServiceBus
 ```
 
 ### Prerequisites
-Set up a way to authenticate to Azure with Azure Identity.
 
-Some options are:
-- Through the [Azure CLI Login](https://docs.microsoft.com/cli/azure/authenticate-azure-cli).
-- Via [Visual Studio](https://docs.microsoft.com/dotnet/api/overview/azure/identity-readme?view=azure-dotnet#authenticating-via-visual-studio).
-- Setting [Environment Variables](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/resourcemanager/Azure.ResourceManager/docs/AuthUsingEnvironmentVariables.md).
-
-More information and different authentication approaches using Azure Identity can be found in [this document](https://docs.microsoft.com/dotnet/api/overview/azure/identity-readme?view=azure-dotnet).
+* You must have an [Microsoft Azure subscription](https://azure.microsoft.com/free/dotnet/).
 
 ### Authenticate the Client
 
-The default option to create an authenticated client is to use `DefaultAzureCredential`. Since all management APIs go through the same endpoint, in order to interact with resources, only one top-level `ArmClient` has to be created.
-
-To authenticate to Azure and create an `ArmClient`, do the following:
-
-```C# Snippet:Managing_ServiceBus_AuthClient_Usings
-using Azure.Identity;
-```
-
-```C# Snippet:Managing_ServiceBus_AuthClient
-ArmClient armClient = new ArmClient(new DefaultAzureCredential());
-```
-
-Additional documentation for the `Azure.Identity.DefaultAzureCredential` class can be found in [this document](https://docs.microsoft.com/dotnet/api/azure.identity.defaultazurecredential).
+To create an authenticated client and start interacting with Microsoft Azure resources, see the [quickstart guide here](https://github.com/Azure/azure-sdk-for-net/blob/main/doc/dev/mgmt_quickstart.md).
 
 ## Key concepts
 
-Key concepts of the Azure .NET SDK can be found [here](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/resourcemanager/Azure.ResourceManager/README.md#key-concepts)
-
+Key concepts of the Microsoft Azure SDK for .NET can be found [here](https://azure.github.io/azure-sdk/dotnet_introduction.html).
 
 ## Documentation
 
-Documentation is available to help you learn how to use this package
+Documentation is available to help you learn how to use this package:
 
-- [Quickstart](https://github.com/Azure/azure-sdk-for-net/blob/main/doc/mgmt_preview_quickstart.md)
-- [API References](https://docs.microsoft.com/dotnet/api/?view=azure-dotnet)
-- [Authentication](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/identity/Azure.Identity/README.md)
+- [Quickstart](https://github.com/Azure/azure-sdk-for-net/blob/main/doc/dev/mgmt_quickstart.md).
+- [API References](https://docs.microsoft.com/dotnet/api/?view=azure-dotnet).
+- [Authentication](https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/identity/Azure.Identity/README.md).
 
 ## Examples
 
@@ -95,22 +86,6 @@ ServiceBusNamespaceResource serviceBusNamespace = await namespaceCollection.GetA
 Console.WriteLine(serviceBusNamespace.Id.Name);
 ```
 
-### Try to get a namespace if it exists
-
-
-```C# Snippet:Managing_ServiceBusNamespaces_GetNamespaceIfExists
-ServiceBusNamespaceCollection namespaceCollection = resourceGroup.GetServiceBusNamespaces();
-ServiceBusNamespaceResource serviceBusNamespace = await namespaceCollection.GetIfExistsAsync("foo");
-if (serviceBusNamespace != null)
-{
-    Console.WriteLine("namespace 'foo' exists");
-}
-if (await namespaceCollection.ExistsAsync("bar"))
-{
-    Console.WriteLine("namespace 'bar' exists");
-}
-```
-
 ### Delete a namespace
 ```C# Snippet:Managing_ServiceBusNamespaces_DeleteNamespace
 ServiceBusNamespaceCollection namespaceCollection = resourceGroup.GetServiceBusNamespaces();
@@ -118,26 +93,22 @@ ServiceBusNamespaceResource serviceBusNamespace = await namespaceCollection.GetA
 await serviceBusNamespace.DeleteAsync(WaitUntil.Completed);
 ```
 
-
-For more detailed examples, take a look at [samples](https://github.com/yukun-dong/azure-sdk-for-net/tree/track2-servicebus/sdk/servicebus/Azure.ResourceManager.ServiceBus/samples) we have available.
+More code samples for using the management library for .NET can be found in the following locations
+- [.NET Management Library Code Samples](https://aka.ms/azuresdk-net-mgmt-samples)
 
 ## Troubleshooting
 
--   File an issue via [Github
-    Issues](https://github.com/Azure/azure-sdk-for-net/issues)
--   Check [previous
-    questions](https://stackoverflow.com/questions/tagged/azure+.net)
-    or ask new ones on Stack Overflow using azure and .net tags.
-
+-   File an issue via [GitHub Issues](https://github.com/Azure/azure-sdk-for-net/issues).
+-   Check [previous questions](https://stackoverflow.com/questions/tagged/azure+.net) or ask new ones on Stack Overflow using Azure and .NET tags.
 
 ## Next steps
 
-For more information on Azure SDK, please refer to [this website](https://azure.github.io/azure-sdk/)
+For more information about Microsoft Azure SDK, see [this website](https://azure.github.io/azure-sdk/).
 
 ## Contributing
 
-For details on contributing to this repository, see the contributing
-guide.
+For details on contributing to this repository, see the [contributing
+guide][cg].
 
 This project welcomes contributions and suggestions. Most contributions
 require you to agree to a Contributor License Agreement (CLA) declaring
@@ -146,16 +117,15 @@ your contribution. For details, visit <https://cla.microsoft.com>.
 
 When you submit a pull request, a CLA-bot will automatically determine
 whether you need to provide a CLA and decorate the PR appropriately
-(e.g., label, comment). Simply follow the instructions provided by the
-bot. You will only need to do this once across all repositories using
-our CLA.
+(for example, label, comment). Follow the instructions provided by the
+bot. You'll only need to do this action once across all repositories
+using our CLA.
 
-This project has adopted the Microsoft Open Source Code of Conduct. For
-more information see the Code of Conduct FAQ or contact
-<opencode@microsoft.com> with any additional questions or comments.
+This project has adopted the [Microsoft Open Source Code of Conduct][coc]. For
+more information, see the [Code of Conduct FAQ][coc_faq] or contact
+<opencode@microsoft.com> with any other questions or comments.
 
 <!-- LINKS -->
-[style-guide-msft]: https://docs.microsoft.com/style-guide/capitalization
-[style-guide-cloud]: https://aka.ms/azsdk/cloud-style-guide
-
-![Impressions](https://azure-sdk-impressions.azurewebsites.net/api/impressions/azure-sdk-for-net%2Fsdk%2Ftemplate%2FAzure.ResourceManager.ServiceBus%2FREADME.png)
+[cg]: https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/resourcemanager/Azure.ResourceManager/docs/CONTRIBUTING.md
+[coc]: https://opensource.microsoft.com/codeofconduct/
+[coc_faq]: https://opensource.microsoft.com/codeofconduct/faq/

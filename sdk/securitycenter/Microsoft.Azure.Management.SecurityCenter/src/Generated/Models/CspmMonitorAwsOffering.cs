@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.Security.Models
     using System.Linq;
 
     /// <summary>
-    /// The CSPM monitoring for AWS offering configurations
+    /// The CSPM monitoring for AWS offering
     /// </summary>
     [Newtonsoft.Json.JsonObject("CspmMonitorAws")]
     public partial class CspmMonitorAwsOffering : CloudOffering

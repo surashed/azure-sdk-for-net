@@ -36,6 +36,11 @@ namespace Azure.ResourceManager.Compute.Models
                 writer.WritePropertyName("enableAcceleratedNetworking");
                 writer.WriteBooleanValue(EnableAcceleratedNetworking.Value);
             }
+            if (Optional.IsDefined(IsTcpStateTrackingDisabled))
+            {
+                writer.WritePropertyName("disableTcpStateTracking");
+                writer.WriteBooleanValue(IsTcpStateTrackingDisabled.Value);
+            }
             if (Optional.IsDefined(EnableFpga))
             {
                 writer.WritePropertyName("enableFpga");
@@ -79,8 +84,9 @@ namespace Azure.ResourceManager.Compute.Models
         {
             string name = default;
             Optional<bool> primary = default;
-            Optional<DeleteOptions> deleteOption = default;
+            Optional<ComputeDeleteOption> deleteOption = default;
             Optional<bool> enableAcceleratedNetworking = default;
+            Optional<bool> disableTcpStateTracking = default;
             Optional<bool> enableFpga = default;
             Optional<bool> enableIPForwarding = default;
             Optional<WritableSubResource> networkSecurityGroup = default;
@@ -120,7 +126,7 @@ namespace Azure.ResourceManager.Compute.Models
                                 property0.ThrowNonNullablePropertyIsNull();
                                 continue;
                             }
-                            deleteOption = new DeleteOptions(property0.Value.GetString());
+                            deleteOption = new ComputeDeleteOption(property0.Value.GetString());
                             continue;
                         }
                         if (property0.NameEquals("enableAcceleratedNetworking"))
@@ -131,6 +137,16 @@ namespace Azure.ResourceManager.Compute.Models
                                 continue;
                             }
                             enableAcceleratedNetworking = property0.Value.GetBoolean();
+                            continue;
+                        }
+                        if (property0.NameEquals("disableTcpStateTracking"))
+                        {
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                property0.ThrowNonNullablePropertyIsNull();
+                                continue;
+                            }
+                            disableTcpStateTracking = property0.Value.GetBoolean();
                             continue;
                         }
                         if (property0.NameEquals("enableFpga"))
@@ -160,7 +176,7 @@ namespace Azure.ResourceManager.Compute.Models
                                 property0.ThrowNonNullablePropertyIsNull();
                                 continue;
                             }
-                            networkSecurityGroup = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.ToString());
+                            networkSecurityGroup = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.GetRawText());
                             continue;
                         }
                         if (property0.NameEquals("dnsSettings"))
@@ -195,14 +211,14 @@ namespace Azure.ResourceManager.Compute.Models
                                 property0.ThrowNonNullablePropertyIsNull();
                                 continue;
                             }
-                            dscpConfiguration = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.ToString());
+                            dscpConfiguration = JsonSerializer.Deserialize<WritableSubResource>(property0.Value.GetRawText());
                             continue;
                         }
                     }
                     continue;
                 }
             }
-            return new VirtualMachineNetworkInterfaceConfiguration(name, Optional.ToNullable(primary), Optional.ToNullable(deleteOption), Optional.ToNullable(enableAcceleratedNetworking), Optional.ToNullable(enableFpga), Optional.ToNullable(enableIPForwarding), networkSecurityGroup, dnsSettings.Value, Optional.ToList(ipConfigurations), dscpConfiguration);
+            return new VirtualMachineNetworkInterfaceConfiguration(name, Optional.ToNullable(primary), Optional.ToNullable(deleteOption), Optional.ToNullable(enableAcceleratedNetworking), Optional.ToNullable(disableTcpStateTracking), Optional.ToNullable(enableFpga), Optional.ToNullable(enableIPForwarding), networkSecurityGroup, dnsSettings.Value, Optional.ToList(ipConfigurations), dscpConfiguration);
         }
     }
 }

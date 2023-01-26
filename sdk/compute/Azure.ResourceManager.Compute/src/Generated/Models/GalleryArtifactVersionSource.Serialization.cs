@@ -5,7 +5,6 @@
 
 #nullable disable
 
-using System;
 using System.Text.Json;
 using Azure.Core;
 
@@ -21,37 +20,26 @@ namespace Azure.ResourceManager.Compute.Models
                 writer.WritePropertyName("id");
                 writer.WriteStringValue(Id);
             }
-            if (Optional.IsDefined(Uri))
-            {
-                writer.WritePropertyName("uri");
-                writer.WriteStringValue(Uri.AbsoluteUri);
-            }
             writer.WriteEndObject();
         }
 
         internal static GalleryArtifactVersionSource DeserializeGalleryArtifactVersionSource(JsonElement element)
         {
-            Optional<string> id = default;
-            Optional<Uri> uri = default;
+            Optional<ResourceIdentifier> id = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("id"))
                 {
-                    id = property.Value.GetString();
-                    continue;
-                }
-                if (property.NameEquals("uri"))
-                {
                     if (property.Value.ValueKind == JsonValueKind.Null)
                     {
-                        uri = null;
+                        property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    uri = new Uri(property.Value.GetString());
+                    id = new ResourceIdentifier(property.Value.GetString());
                     continue;
                 }
             }
-            return new GalleryArtifactVersionSource(id.Value, uri.Value);
+            return new GalleryArtifactVersionSource(id.Value);
         }
     }
 }

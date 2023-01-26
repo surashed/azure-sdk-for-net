@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Azure;
 using Azure.Core;
-using Azure.ResourceManager.Models;
 using Azure.ResourceManager.Resources;
 
 namespace Azure.ResourceManager.Resources.Models
@@ -25,16 +25,16 @@ namespace Azure.ResourceManager.Resources.Models
             Optional<BinaryData> outputs = default;
             Optional<IReadOnlyList<ResourceProviderData>> providers = default;
             Optional<IReadOnlyList<ArmDependency>> dependencies = default;
-            Optional<TemplateLink> templateLink = default;
+            Optional<ArmDeploymentTemplateLink> templateLink = default;
             Optional<BinaryData> parameters = default;
-            Optional<ParametersLink> parametersLink = default;
+            Optional<ArmDeploymentParametersLink> parametersLink = default;
             Optional<ArmDeploymentMode> mode = default;
             Optional<DebugSetting> debugSetting = default;
-            Optional<OnErrorDeploymentExtended> onErrorDeployment = default;
+            Optional<ErrorDeploymentExtended> onErrorDeployment = default;
             Optional<string> templateHash = default;
             Optional<IReadOnlyList<SubResource>> outputResources = default;
             Optional<IReadOnlyList<SubResource>> validatedResources = default;
-            Optional<ErrorDetail> error = default;
+            Optional<ResponseError> error = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("provisioningState"))
@@ -92,7 +92,7 @@ namespace Azure.ResourceManager.Resources.Models
                     List<ResourceProviderData> array = new List<ResourceProviderData>();
                     foreach (var item in property.Value.EnumerateArray())
                     {
-                        array.Add(JsonSerializer.Deserialize<ResourceProviderData>(item.ToString()));
+                        array.Add(JsonSerializer.Deserialize<ResourceProviderData>(item.GetRawText()));
                     }
                     providers = array;
                     continue;
@@ -119,7 +119,7 @@ namespace Azure.ResourceManager.Resources.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    templateLink = TemplateLink.DeserializeTemplateLink(property.Value);
+                    templateLink = ArmDeploymentTemplateLink.DeserializeArmDeploymentTemplateLink(property.Value);
                     continue;
                 }
                 if (property.NameEquals("parameters"))
@@ -139,7 +139,7 @@ namespace Azure.ResourceManager.Resources.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    parametersLink = ParametersLink.DeserializeParametersLink(property.Value);
+                    parametersLink = ArmDeploymentParametersLink.DeserializeArmDeploymentParametersLink(property.Value);
                     continue;
                 }
                 if (property.NameEquals("mode"))
@@ -169,7 +169,7 @@ namespace Azure.ResourceManager.Resources.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    onErrorDeployment = OnErrorDeploymentExtended.DeserializeOnErrorDeploymentExtended(property.Value);
+                    onErrorDeployment = ErrorDeploymentExtended.DeserializeErrorDeploymentExtended(property.Value);
                     continue;
                 }
                 if (property.NameEquals("templateHash"))
@@ -187,7 +187,7 @@ namespace Azure.ResourceManager.Resources.Models
                     List<SubResource> array = new List<SubResource>();
                     foreach (var item in property.Value.EnumerateArray())
                     {
-                        array.Add(JsonSerializer.Deserialize<SubResource>(item.ToString()));
+                        array.Add(JsonSerializer.Deserialize<SubResource>(item.GetRawText()));
                     }
                     outputResources = array;
                     continue;
@@ -202,7 +202,7 @@ namespace Azure.ResourceManager.Resources.Models
                     List<SubResource> array = new List<SubResource>();
                     foreach (var item in property.Value.EnumerateArray())
                     {
-                        array.Add(JsonSerializer.Deserialize<SubResource>(item.ToString()));
+                        array.Add(JsonSerializer.Deserialize<SubResource>(item.GetRawText()));
                     }
                     validatedResources = array;
                     continue;
@@ -214,11 +214,11 @@ namespace Azure.ResourceManager.Resources.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    error = JsonSerializer.Deserialize<ErrorDetail>(property.Value.ToString());
+                    error = JsonSerializer.Deserialize<ResponseError>(property.Value.GetRawText());
                     continue;
                 }
             }
-            return new ArmDeploymentPropertiesExtended(Optional.ToNullable(provisioningState), correlationId.Value, Optional.ToNullable(timestamp), Optional.ToNullable(duration), outputs.Value, Optional.ToList(providers), Optional.ToList(dependencies), templateLink.Value, parameters.Value, parametersLink.Value, Optional.ToNullable(mode), debugSetting.Value, onErrorDeployment.Value, templateHash.Value, Optional.ToList(outputResources), Optional.ToList(validatedResources), error);
+            return new ArmDeploymentPropertiesExtended(Optional.ToNullable(provisioningState), correlationId.Value, Optional.ToNullable(timestamp), Optional.ToNullable(duration), outputs.Value, Optional.ToList(providers), Optional.ToList(dependencies), templateLink.Value, parameters.Value, parametersLink.Value, Optional.ToNullable(mode), debugSetting.Value, onErrorDeployment.Value, templateHash.Value, Optional.ToList(outputResources), Optional.ToList(validatedResources), error.Value);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Microsoft.Azure.Management.Security.Models
         /// DefenderForContainersAwsOfferingKubernetesService class.
         /// </summary>
         /// <param name="cloudRoleArn">The cloud role ARN in AWS for this
-        /// feature</param>
+        /// feature used for provisioning resources</param>
         public DefenderForContainersAwsOfferingKubernetesService(string cloudRoleArn = default(string))
         {
             CloudRoleArn = cloudRoleArn;
@@ -45,7 +45,8 @@ namespace Microsoft.Azure.Management.Security.Models
         partial void CustomInit();
 
         /// <summary>
-        /// Gets or sets the cloud role ARN in AWS for this feature
+        /// Gets or sets the cloud role ARN in AWS for this feature used for
+        /// provisioning resources
         /// </summary>
         [JsonProperty(PropertyName = "cloudRoleArn")]
         public string CloudRoleArn { get; set; }

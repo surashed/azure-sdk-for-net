@@ -9,7 +9,7 @@ using System.Text.Json;
 using Azure.Core;
 using Azure.ResourceManager.Models;
 
-namespace Azure.ResourceManager.Management.Models
+namespace Azure.ResourceManager.ManagementGroups.Models
 {
     public partial class DescendantData
     {
@@ -18,7 +18,7 @@ namespace Azure.ResourceManager.Management.Models
             ResourceIdentifier id = default;
             string name = default;
             ResourceType type = default;
-            SystemData systemData = default;
+            Optional<SystemData> systemData = default;
             Optional<string> displayName = default;
             Optional<DescendantParentGroupInfo> parent = default;
             foreach (var property in element.EnumerateObject())
@@ -35,12 +35,17 @@ namespace Azure.ResourceManager.Management.Models
                 }
                 if (property.NameEquals("type"))
                 {
-                    type = property.Value.GetString();
+                    type = new ResourceType(property.Value.GetString());
                     continue;
                 }
                 if (property.NameEquals("systemData"))
                 {
-                    systemData = JsonSerializer.Deserialize<SystemData>(property.Value.ToString());
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    systemData = JsonSerializer.Deserialize<SystemData>(property.Value.GetRawText());
                     continue;
                 }
                 if (property.NameEquals("properties"))
@@ -76,7 +81,7 @@ namespace Azure.ResourceManager.Management.Models
                     continue;
                 }
             }
-            return new DescendantData(id, name, type, systemData, displayName.Value, parent.Value);
+            return new DescendantData(id, name, type, systemData.Value, displayName.Value, parent.Value);
         }
     }
 }

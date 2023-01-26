@@ -2,11 +2,14 @@
 // Licensed under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Core;
 
 namespace Azure.Data.AppConfiguration
 {
@@ -71,7 +74,7 @@ namespace Azure.Data.AppConfiguration
             return ReadSetting(root);
         }
 
-        private static ConfigurationSetting ReadSetting(JsonElement root)
+        public static ConfigurationSetting ReadSetting(JsonElement root)
         {
             ConfigurationSetting setting;
 
@@ -180,61 +183,6 @@ namespace Azure.Data.AppConfiguration
             using JsonDocument json = JsonDocument.Parse(content, default);
             JsonElement root = json.RootElement;
             return ReadSetting(root);
-        }
-
-        public static async Task<SettingBatch> ParseBatchAsync(Response response, CancellationToken cancellation)
-        {
-            Stream content = response.ContentStream;
-            using (JsonDocument json = await JsonDocument.ParseAsync(content, cancellationToken: cancellation).ConfigureAwait(false))
-            {
-                return ParseSettingBatch(response, json);
-            }
-        }
-
-        public static SettingBatch ParseBatch(Response response)
-        {
-            Stream content = response.ContentStream;
-            using (JsonDocument json = JsonDocument.Parse(content))
-            {
-                return ParseSettingBatch(response, json);
-            }
-        }
-
-        private static SettingBatch ParseSettingBatch(Response response, JsonDocument json)
-        {
-            TryGetNextAfterValue(ref response, out string nextBatchUri);
-
-            JsonElement itemsArray = json.RootElement.GetProperty("items");
-            int length = itemsArray.GetArrayLength();
-            ConfigurationSetting[] settings = new ConfigurationSetting[length];
-
-            int i = 0;
-            foreach (JsonElement item in itemsArray.EnumerateArray())
-            {
-                settings[i++] = ReadSetting(item);
-            }
-
-            return new SettingBatch(settings, nextBatchUri);
-        }
-
-        private const string Link = "Link";
-        private const string After = "after=";
-        private static bool TryGetNextAfterValue(ref Response response, out string afterValue)
-        {
-            afterValue = default;
-            if (!response.Headers.TryGetValue(Link, out var headerValue))
-                return false;
-
-            // the headers value is something like this: "</kv?after={token}>; rel=\"next\""
-            var afterIndex = headerValue.IndexOf(After, StringComparison.Ordinal);
-            if (afterIndex < 0)
-                return false;
-
-            int beginingToken = afterIndex + After.Length;
-            int endToken = headerValue.IndexOf(">", StringComparison.Ordinal);
-            int tokenLength = endToken - beginingToken;
-            afterValue = headerValue.Substring(beginingToken, tokenLength);
-            return true;
         }
     }
 }

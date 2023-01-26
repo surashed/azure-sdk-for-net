@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.Security.Models
     using System.Linq;
 
     /// <summary>
-    /// The Defender for Servers AWS offering configurations
+    /// The Defender for Servers AWS offering
     /// </summary>
     [Newtonsoft.Json.JsonObject("DefenderForServersAws")]
     public partial class DefenderForServersAwsOffering : CloudOffering
@@ -37,11 +37,23 @@ namespace Microsoft.Azure.Management.Security.Models
         /// connection configuration</param>
         /// <param name="arcAutoProvisioning">The ARC autoprovisioning
         /// configuration</param>
-        public DefenderForServersAwsOffering(string description = default(string), DefenderForServersAwsOfferingDefenderForServers defenderForServers = default(DefenderForServersAwsOfferingDefenderForServers), DefenderForServersAwsOfferingArcAutoProvisioning arcAutoProvisioning = default(DefenderForServersAwsOfferingArcAutoProvisioning))
+        /// <param name="vaAutoProvisioning">The Vulnerability Assessment
+        /// autoprovisioning configuration</param>
+        /// <param name="mdeAutoProvisioning">The Microsoft Defender for
+        /// Endpoint autoprovisioning configuration</param>
+        /// <param name="subPlan">configuration for the servers offering
+        /// subPlan</param>
+        /// <param name="vmScanners">The Microsoft Defender for Server VM
+        /// scanning configuration</param>
+        public DefenderForServersAwsOffering(string description = default(string), DefenderForServersAwsOfferingDefenderForServers defenderForServers = default(DefenderForServersAwsOfferingDefenderForServers), DefenderForServersAwsOfferingArcAutoProvisioning arcAutoProvisioning = default(DefenderForServersAwsOfferingArcAutoProvisioning), DefenderForServersAwsOfferingVaAutoProvisioning vaAutoProvisioning = default(DefenderForServersAwsOfferingVaAutoProvisioning), DefenderForServersAwsOfferingMdeAutoProvisioning mdeAutoProvisioning = default(DefenderForServersAwsOfferingMdeAutoProvisioning), DefenderForServersAwsOfferingSubPlan subPlan = default(DefenderForServersAwsOfferingSubPlan), DefenderForServersAwsOfferingVmScanners vmScanners = default(DefenderForServersAwsOfferingVmScanners))
             : base(description)
         {
             DefenderForServers = defenderForServers;
             ArcAutoProvisioning = arcAutoProvisioning;
+            VaAutoProvisioning = vaAutoProvisioning;
+            MdeAutoProvisioning = mdeAutoProvisioning;
+            SubPlan = subPlan;
+            VmScanners = vmScanners;
             CustomInit();
         }
 
@@ -61,6 +73,33 @@ namespace Microsoft.Azure.Management.Security.Models
         /// </summary>
         [JsonProperty(PropertyName = "arcAutoProvisioning")]
         public DefenderForServersAwsOfferingArcAutoProvisioning ArcAutoProvisioning { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Vulnerability Assessment autoprovisioning
+        /// configuration
+        /// </summary>
+        [JsonProperty(PropertyName = "vaAutoProvisioning")]
+        public DefenderForServersAwsOfferingVaAutoProvisioning VaAutoProvisioning { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Microsoft Defender for Endpoint autoprovisioning
+        /// configuration
+        /// </summary>
+        [JsonProperty(PropertyName = "mdeAutoProvisioning")]
+        public DefenderForServersAwsOfferingMdeAutoProvisioning MdeAutoProvisioning { get; set; }
+
+        /// <summary>
+        /// Gets or sets configuration for the servers offering subPlan
+        /// </summary>
+        [JsonProperty(PropertyName = "subPlan")]
+        public DefenderForServersAwsOfferingSubPlan SubPlan { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Microsoft Defender for Server VM scanning
+        /// configuration
+        /// </summary>
+        [JsonProperty(PropertyName = "vmScanners")]
+        public DefenderForServersAwsOfferingVmScanners VmScanners { get; set; }
 
     }
 }

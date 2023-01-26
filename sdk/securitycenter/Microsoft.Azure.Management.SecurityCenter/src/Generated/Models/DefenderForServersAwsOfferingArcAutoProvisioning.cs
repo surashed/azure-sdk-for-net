@@ -32,12 +32,12 @@ namespace Microsoft.Azure.Management.Security.Models
         /// DefenderForServersAwsOfferingArcAutoProvisioning class.
         /// </summary>
         /// <param name="enabled">Is arc auto provisioning enabled</param>
-        /// <param name="servicePrincipalSecretMetadata">Metadata of Service
-        /// Principal secret for autoprovisioning</param>
-        public DefenderForServersAwsOfferingArcAutoProvisioning(bool? enabled = default(bool?), DefenderForServersAwsOfferingArcAutoProvisioningServicePrincipalSecretMetadata servicePrincipalSecretMetadata = default(DefenderForServersAwsOfferingArcAutoProvisioningServicePrincipalSecretMetadata))
+        /// <param name="cloudRoleArn">The cloud role ARN in AWS for this
+        /// feature</param>
+        public DefenderForServersAwsOfferingArcAutoProvisioning(bool? enabled = default(bool?), string cloudRoleArn = default(string))
         {
             Enabled = enabled;
-            ServicePrincipalSecretMetadata = servicePrincipalSecretMetadata;
+            CloudRoleArn = cloudRoleArn;
             CustomInit();
         }
 
@@ -53,11 +53,10 @@ namespace Microsoft.Azure.Management.Security.Models
         public bool? Enabled { get; set; }
 
         /// <summary>
-        /// Gets or sets metadata of Service Principal secret for
-        /// autoprovisioning
+        /// Gets or sets the cloud role ARN in AWS for this feature
         /// </summary>
-        [JsonProperty(PropertyName = "servicePrincipalSecretMetadata")]
-        public DefenderForServersAwsOfferingArcAutoProvisioningServicePrincipalSecretMetadata ServicePrincipalSecretMetadata { get; set; }
+        [JsonProperty(PropertyName = "cloudRoleArn")]
+        public string CloudRoleArn { get; set; }
 
     }
 }

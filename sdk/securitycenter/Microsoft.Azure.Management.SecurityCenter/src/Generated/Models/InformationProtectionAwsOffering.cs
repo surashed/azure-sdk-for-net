@@ -14,7 +14,7 @@ namespace Microsoft.Azure.Management.Security.Models
     using System.Linq;
 
     /// <summary>
-    /// The information protection for AWS offering configurations
+    /// The information protection for AWS offering
     /// </summary>
     [Newtonsoft.Json.JsonObject("InformationProtectionAws")]
     public partial class InformationProtectionAwsOffering : CloudOffering

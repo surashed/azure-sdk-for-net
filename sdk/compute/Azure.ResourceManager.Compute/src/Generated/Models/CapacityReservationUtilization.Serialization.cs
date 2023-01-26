@@ -12,13 +12,24 @@ using Azure.ResourceManager.Resources.Models;
 
 namespace Azure.ResourceManager.Compute.Models
 {
-    internal partial class CapacityReservationUtilization
+    public partial class CapacityReservationUtilization
     {
         internal static CapacityReservationUtilization DeserializeCapacityReservationUtilization(JsonElement element)
         {
-            Optional<IReadOnlyList<Resources.Models.SubResource>> virtualMachinesAllocated = default;
+            Optional<int> currentCapacity = default;
+            Optional<IReadOnlyList<SubResource>> virtualMachinesAllocated = default;
             foreach (var property in element.EnumerateObject())
             {
+                if (property.NameEquals("currentCapacity"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    currentCapacity = property.Value.GetInt32();
+                    continue;
+                }
                 if (property.NameEquals("virtualMachinesAllocated"))
                 {
                     if (property.Value.ValueKind == JsonValueKind.Null)
@@ -26,16 +37,16 @@ namespace Azure.ResourceManager.Compute.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    List<Resources.Models.SubResource> array = new List<Resources.Models.SubResource>();
+                    List<SubResource> array = new List<SubResource>();
                     foreach (var item in property.Value.EnumerateArray())
                     {
-                        array.Add(JsonSerializer.Deserialize<Resources.Models.SubResource>(item.ToString()));
+                        array.Add(JsonSerializer.Deserialize<SubResource>(item.GetRawText()));
                     }
                     virtualMachinesAllocated = array;
                     continue;
                 }
             }
-            return new CapacityReservationUtilization(Optional.ToList(virtualMachinesAllocated));
+            return new CapacityReservationUtilization(Optional.ToNullable(currentCapacity), Optional.ToList(virtualMachinesAllocated));
         }
     }
 }

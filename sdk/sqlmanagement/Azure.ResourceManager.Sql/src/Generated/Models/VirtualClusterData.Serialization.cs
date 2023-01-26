@@ -17,27 +17,25 @@ namespace Azure.ResourceManager.Sql
         void IUtf8JsonSerializable.Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName("tags");
-            writer.WriteStartObject();
-            foreach (var item in Tags)
+            if (Optional.IsCollectionDefined(Tags))
             {
-                writer.WritePropertyName(item.Key);
-                writer.WriteStringValue(item.Value);
+                writer.WritePropertyName("tags");
+                writer.WriteStartObject();
+                foreach (var item in Tags)
+                {
+                    writer.WritePropertyName(item.Key);
+                    writer.WriteStringValue(item.Value);
+                }
+                writer.WriteEndObject();
             }
-            writer.WriteEndObject();
             writer.WritePropertyName("location");
             writer.WriteStringValue(Location);
             writer.WritePropertyName("properties");
             writer.WriteStartObject();
-            if (Optional.IsDefined(Family))
+            if (Optional.IsDefined(Version))
             {
-                writer.WritePropertyName("family");
-                writer.WriteStringValue(Family);
-            }
-            if (Optional.IsDefined(MaintenanceConfigurationId))
-            {
-                writer.WritePropertyName("maintenanceConfigurationId");
-                writer.WriteStringValue(MaintenanceConfigurationId);
+                writer.WritePropertyName("version");
+                writer.WriteStringValue(Version);
             }
             writer.WriteEndObject();
             writer.WriteEndObject();
@@ -45,20 +43,24 @@ namespace Azure.ResourceManager.Sql
 
         internal static VirtualClusterData DeserializeVirtualClusterData(JsonElement element)
         {
-            IDictionary<string, string> tags = default;
+            Optional<IDictionary<string, string>> tags = default;
             AzureLocation location = default;
             ResourceIdentifier id = default;
             string name = default;
             ResourceType type = default;
-            SystemData systemData = default;
-            Optional<string> subnetId = default;
-            Optional<string> family = default;
+            Optional<SystemData> systemData = default;
+            Optional<ResourceIdentifier> subnetId = default;
+            Optional<string> version = default;
             Optional<IReadOnlyList<string>> childResources = default;
-            Optional<string> maintenanceConfigurationId = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("tags"))
                 {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
                     Dictionary<string, string> dictionary = new Dictionary<string, string>();
                     foreach (var property0 in property.Value.EnumerateObject())
                     {
@@ -69,7 +71,7 @@ namespace Azure.ResourceManager.Sql
                 }
                 if (property.NameEquals("location"))
                 {
-                    location = property.Value.GetString();
+                    location = new AzureLocation(property.Value.GetString());
                     continue;
                 }
                 if (property.NameEquals("id"))
@@ -84,12 +86,17 @@ namespace Azure.ResourceManager.Sql
                 }
                 if (property.NameEquals("type"))
                 {
-                    type = property.Value.GetString();
+                    type = new ResourceType(property.Value.GetString());
                     continue;
                 }
                 if (property.NameEquals("systemData"))
                 {
-                    systemData = JsonSerializer.Deserialize<SystemData>(property.Value.ToString());
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    systemData = JsonSerializer.Deserialize<SystemData>(property.Value.GetRawText());
                     continue;
                 }
                 if (property.NameEquals("properties"))
@@ -103,12 +110,17 @@ namespace Azure.ResourceManager.Sql
                     {
                         if (property0.NameEquals("subnetId"))
                         {
-                            subnetId = property0.Value.GetString();
+                            if (property0.Value.ValueKind == JsonValueKind.Null)
+                            {
+                                property0.ThrowNonNullablePropertyIsNull();
+                                continue;
+                            }
+                            subnetId = new ResourceIdentifier(property0.Value.GetString());
                             continue;
                         }
-                        if (property0.NameEquals("family"))
+                        if (property0.NameEquals("version"))
                         {
-                            family = property0.Value.GetString();
+                            version = property0.Value.GetString();
                             continue;
                         }
                         if (property0.NameEquals("childResources"))
@@ -126,16 +138,11 @@ namespace Azure.ResourceManager.Sql
                             childResources = array;
                             continue;
                         }
-                        if (property0.NameEquals("maintenanceConfigurationId"))
-                        {
-                            maintenanceConfigurationId = property0.Value.GetString();
-                            continue;
-                        }
                     }
                     continue;
                 }
             }
-            return new VirtualClusterData(id, name, type, systemData, tags, location, subnetId.Value, family.Value, Optional.ToList(childResources), maintenanceConfigurationId.Value);
+            return new VirtualClusterData(id, name, type, systemData.Value, Optional.ToDictionary(tags), location, subnetId.Value, version.Value, Optional.ToList(childResources));
         }
     }
 }

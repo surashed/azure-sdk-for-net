@@ -15,10 +15,10 @@ namespace Azure.ResourceManager.Compute.Models
         void IUtf8JsonSerializable.Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            if (Optional.IsDefined(DisablePasswordAuthentication))
+            if (Optional.IsDefined(IsPasswordAuthenticationDisabled))
             {
                 writer.WritePropertyName("disablePasswordAuthentication");
-                writer.WriteBooleanValue(DisablePasswordAuthentication.Value);
+                writer.WriteBooleanValue(IsPasswordAuthenticationDisabled.Value);
             }
             if (Optional.IsDefined(Ssh))
             {
@@ -35,6 +35,11 @@ namespace Azure.ResourceManager.Compute.Models
                 writer.WritePropertyName("patchSettings");
                 writer.WriteObjectValue(PatchSettings);
             }
+            if (Optional.IsDefined(IsVmAgentPlatformUpdatesEnabled))
+            {
+                writer.WritePropertyName("enableVMAgentPlatformUpdates");
+                writer.WriteBooleanValue(IsVmAgentPlatformUpdatesEnabled.Value);
+            }
             writer.WriteEndObject();
         }
 
@@ -42,8 +47,9 @@ namespace Azure.ResourceManager.Compute.Models
         {
             Optional<bool> disablePasswordAuthentication = default;
             Optional<SshConfiguration> ssh = default;
-            Optional<bool> provisionVMAgent = default;
+            Optional<bool> provisionVmAgent = default;
             Optional<LinuxPatchSettings> patchSettings = default;
+            Optional<bool> enableVmAgentPlatformUpdates = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("disablePasswordAuthentication"))
@@ -73,7 +79,7 @@ namespace Azure.ResourceManager.Compute.Models
                         property.ThrowNonNullablePropertyIsNull();
                         continue;
                     }
-                    provisionVMAgent = property.Value.GetBoolean();
+                    provisionVmAgent = property.Value.GetBoolean();
                     continue;
                 }
                 if (property.NameEquals("patchSettings"))
@@ -86,8 +92,18 @@ namespace Azure.ResourceManager.Compute.Models
                     patchSettings = LinuxPatchSettings.DeserializeLinuxPatchSettings(property.Value);
                     continue;
                 }
+                if (property.NameEquals("enableVMAgentPlatformUpdates"))
+                {
+                    if (property.Value.ValueKind == JsonValueKind.Null)
+                    {
+                        property.ThrowNonNullablePropertyIsNull();
+                        continue;
+                    }
+                    enableVmAgentPlatformUpdates = property.Value.GetBoolean();
+                    continue;
+                }
             }
-            return new LinuxConfiguration(Optional.ToNullable(disablePasswordAuthentication), ssh.Value, Optional.ToNullable(provisionVMAgent), patchSettings.Value);
+            return new LinuxConfiguration(Optional.ToNullable(disablePasswordAuthentication), ssh.Value, Optional.ToNullable(provisionVmAgent), patchSettings.Value, Optional.ToNullable(enableVmAgentPlatformUpdates));
         }
     }
 }

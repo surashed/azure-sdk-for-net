@@ -6,10 +6,11 @@ Run `dotnet build /t:GenerateCode` to generate code.
 > see https://aka.ms/autorest
 
 ``` yaml
-tag: package-artifacts-composite-v3
+tag: package-artifacts-composite-v6
 require:
-    - https://github.com/Azure/azure-rest-api-specs/blob/8c1b6936238a1734036c22e3ae98b31c6b9f04cb/specification/synapse/data-plane/readme.md
+    - https://github.com/Azure/azure-rest-api-specs/blob/61a8b1a62420c393fe5276c47373ea8dce74a985/specification/synapse/data-plane/readme.md
 namespace: Azure.Analytics.Synapse.Artifacts
+generation1-convenience-client: true
 public-clients: true
 security: AADToken
 security-scopes: https://dev.azuresynapse.net/.default
@@ -74,12 +75,14 @@ directive:
           path.endsWith("DatasetDataElement") ||
           path.endsWith("DatasetSchemaDataElement") ||
           path.endsWith("DatasetStorageFormat") ||
+          path.endsWith("EditTablesRequest") ||
           path.endsWith("EvaluateDataFlowExpressionRequest") ||
           path.endsWith("ExposureControlRequest") ||
           path.endsWith("ExposureControlResponse") ||
           path.endsWith("GetSsisObjectMetadataRequest") ||
           path.endsWith("JsonFormat") ||
           path.endsWith("JsonFormatFilePattern") ||
+          path.endsWith("LinkTableRequest") ||
           path.endsWith("OrcFormat") ||
           path.endsWith("ParquetFormat") ||
           path.endsWith("RerunTriggerListResponse") ||
@@ -121,4 +124,16 @@ directive:
   where: $.definitions.TriggerRun.properties
   transform: >
     $.status["x-ms-enum"].values = [{value: "Succeeded", name: "Succeeded" },{value: "Failed", name: "Failed" },{value: "Inprogress", name: "InProgress" }];
+```
+
+### Suppress Abstract Base Class
+
+``` yaml
+suppress-abstract-base-class:
+- CustomSetupBase
+- DataFlow
+- DependencyReference
+- LinkedIntegrationRuntimeType
+- SecretBase
+- WebLinkedServiceTypeProperties
 ```
